@@ -1,0 +1,18 @@
+{
+    "redis":{
+        "server":"121.37.174.251:6479",
+        "tokenExpired":"6000s"
+    },
+    "mysql":{
+        "server":"121.37.174.251:4306",
+        "password":"123456",
+        "user":"root",
+        "dbName":"school"
+    },
+    "service":{
+        "port":"localhost:8200"
+    },
+    "file":{
+        "root":"appfile"
+    }
+}

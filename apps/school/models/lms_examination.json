@@ -1,0 +1,402 @@
+{
+    "modelID":"lms_examination", 
+    "fields":[
+        {
+            "field": "id", 
+            "name": "ID", 
+            "dataType": "varchar",
+            "quickSearch":true
+        },
+        {
+            "field": "name", 
+            "name": "名称", 
+            "dataType": "varchar",
+            "quickSearch":true
+        },
+        {
+            "field": "class_id", 
+            "name": "班级", 
+            "dataType": "varchar",
+            "fieldType":"MANY_TO_ONE",
+            "relatedModelID":"lms_class",
+            "quickSearch":true
+        },
+        {
+            "field": "term_id", 
+            "name": "学期", 
+            "dataType": "varchar",
+            "fieldType":"MANY_TO_ONE",
+            "relatedModelID":"lms_term",
+            "quickSearch":true
+        },
+        {
+            "field": "subject_id", 
+            "name": "课程", 
+            "dataType": "varchar",
+            "fieldType":"MANY_TO_ONE",
+            "relatedModelID":"lms_subject",
+            "quickSearch":true
+        },
+        {
+            "field": "type", 
+            "name": "考试类型", 
+            "dataType": "varchar"
+        },
+        {
+            "field": "start_time", 
+            "name": "起始时间", 
+            "dataType": "datetime"
+        }, 
+        {
+            "field": "end_time", 
+            "name": "结束时间", 
+            "dataType": "datetime"
+        },
+        {
+            "field": "create_time",
+            "name": "创建时间",
+            "dataType": "datetime"
+        }, 
+        {
+            "field": "create_user", 
+            "name": "创建人",
+            "dataType": "varchar"
+        },
+        {
+            "field": "update_time", 
+            "name": "更新时间", 
+            "dataType": "datetime"
+        }, 
+        {
+            "field": "update_user", 
+            "name": "更新人", 
+            "dataType": "varchar"
+        }, 
+        {
+            "field": "remark", 
+            "name": "备注", 
+            "dataType": "varchar",
+            "quickSearch":true
+        }, 
+        {
+            "field": "version", 
+            "name": "数据版本", 
+            "dataType": "int"
+        }
+    ], 
+    "operations": [
+        {
+            "id": "create", 
+            "name": "创建",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:3003/index.html/#/lms_examination/form1/FORM_TYPE_CREATE",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"创建考试",
+                    "key":"/model/lms_examination/form1/create",
+                    "width":600,
+                    "height":450
+            },
+            "input":{},
+            "description":"打开创建考试对话框" 
+        }, 
+        {
+            "id": "edit", 
+            "name": "编辑",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:3003/index.html/#/lms_examination/form1/FORM_TYPE_EDIT",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"编辑考试信息",
+                    "key":"/model/lms_examination/form1/edit",
+                    "width":600,
+                    "height":450
+            },
+            "input":{},
+            "description":"打开考试编辑对话框"
+        },  
+        {
+            "id": "delete", 
+            "name": "删除",
+            "type":"OP_TYPE_REQUEST",
+            "params":{
+                "url":"/data/delete",
+                "method":"post"
+            },
+            "description":"删除选中数据",
+            "successOperation":{
+                "type":"OP_TYPE_MESSAGE",
+                "params":{
+                    "type":"success",
+                    "content":"删除数据成功!",
+                    "duration":"2"
+                },
+                "description":"提示删除数据成功",
+                "successOperation":{
+                    "type":"OP_TYPE_RELOAD_FRAME_DATA",
+                    "params":{
+                        "location":"LOCATION_TYPE_TAB",
+                        "key":"/model/lms_examination"
+                    },
+                    "description":"刷新页面数据"
+                }
+            }
+        },
+        {
+            "id":"save",
+            "name":"保存",
+            "type":"OP_TYPE_REQUEST",
+            "params":{
+                "url":"/data/save",
+                "method":"post"
+            },
+            "description":"保存数据",
+            "successOperation":{
+                "type":"OP_TYPE_CLOSE",
+                "params":{
+                    "location":"LOCATION_TYPE_MODAL"
+                },
+                "input":{},
+                "description":"关闭对话框",
+                "successOperation":{
+                    "type":"OP_TYPE_RELOAD_FRAME_DATA",
+                    "params":{
+                        "location":"LOCATION_TYPE_TAB",
+                        "key":"/model/lms_examination"
+                    },
+                    "description":"刷新页面数据"
+                }
+            }
+        }
+    ], 
+    "views": [
+        {
+            "viewID": "view1", 
+            "name": "考试信息维护", 
+            "description": "考试信息维护", 
+            "fields": [
+                {
+                    "field": "id", 
+                    "width": 100
+                }, 
+                {
+                    "field": "name", 
+                    "width": 200
+                }, 
+                {
+                    "field": "class_id", 
+                    "width": 100
+                },
+                {
+                    "field": "term_id", 
+                    "width": 100
+                }, 
+                {
+                    "field": "subject_id", 
+                    "width": 100
+                },
+                {
+                    "field": "type", 
+                    "width": 100
+                },
+                {
+                    "field": "start_time", 
+                    "width": 200
+                },
+                {
+                    "field": "end_time", 
+                    "width": 200
+                },
+                {
+                    "field": "create_time", 
+                    "width": 200
+                }, 
+                {
+                    "field": "create_user", 
+                    "width": 200
+                }, 
+                {
+                    "field": "update_time", 
+                    "width": 200
+                }, 
+                {
+                    "field": "update_user", 
+                    "width": 200
+                }, 
+                {
+                    "field": "remark", 
+                    "width": 200
+                }, 
+                {
+                    "field": "version", 
+                    "width": 200
+                }
+            ], 
+            "filter": { }, 
+            "toolbar": {
+                "listToolbar": {
+                    "showCount": 3, 
+                    "buttons": [
+                        {
+                            "operationID": "create",
+                            "name":"创建考试"
+                        }
+                    ]
+                }, 
+                "rowToolbar": {
+                    "showCount": 2,
+                    "width":80, 
+                    "buttons": [
+                        {
+                            "operationID": "edit",
+                            "name":"编辑"
+                        },
+                        {
+                            "operationID": "delete",
+                            "name":"删除"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "forms":[
+        {
+            "formID": "form1",
+            "colCount": 4,
+            "rowCount": 2,
+            "rowHeight": 30,
+            "header":{
+                "label":"创建考试"
+            },
+            "footer":{
+                "operations":[
+                    {
+                        "operationID":"save",
+                        "name":"保存"
+                    },
+                    {
+                        "name":"关闭",
+                        "type":"OP_TYPE_CLOSE",
+                        "validateFormData":false,
+                        "params":{
+                            "location":"LOCATION_TYPE_MODAL"
+                        },
+                        "input":{},
+                        "description":"关闭对话框"                            
+                    }
+                ]
+            },
+            "controls": [
+                {
+                    "field": "name", 
+                    "controlType": "Text",
+                    "row": 1,
+                    "col": 1,
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "controlType": "Text",
+                    "row": 1,
+                    "col": 3,
+                    "field": "id", 
+                    "label": "ID",
+                    "colSpan": 2,
+                    "rowSpan": 1,
+                    "disabled":true
+                },
+                {
+                    "field": "class_id", 
+                    "controlType": "SingleSelect",
+                    "optionLabel":"name",
+                    "fields":[
+                        {
+                            "field": "id"
+                        },
+                        {
+                            "field": "name"
+                        }
+                    ],
+                    "row": 2,
+                    "col": 1,
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "field": "term_id", 
+                    "controlType": "SingleSelect",
+                    "optionLabel":"name",
+                    "fields":[
+                        {
+                            "field": "id"
+                        },
+                        {
+                            "field": "name"
+                        }
+                    ],
+                    "row": 2,
+                    "col": 3,
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "field": "subject_id",
+                    "controlType": "SingleSelect",
+                    "optionLabel":"name",
+                    "fields":[
+                        {
+                            "field": "id"
+                        },
+                        {
+                            "field": "name"
+                        }
+                    ],
+                    "row": 3,
+                    "col": 1, 
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "field": "type",
+                    "controlType": "SingleSelect",
+                    "options":[
+                        {"value":"期末考试","label":"期末考试"},
+                        {"value":"期中考试","label":"期中考试"},
+                        {"value":"小测验","label":"小测验"}
+                    ],
+                    "placeholder":"请选择考试类型",
+                    "row": 3,
+                    "col": 3, 
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "field": "start_time", 
+                    "controlType": "DatePicker",
+                    "required":true,
+                    "row": 4,
+                    "col": 1,
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "field": "end_time",
+                    "controlType": "DatePicker",
+                    "row": 4,
+                    "col": 3, 
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "controlType": "TextArea",
+                    "row": 5,
+                    "col": 1,
+                    "field": "remark", 
+                    "colSpan": 4,
+                    "rowSpan": 2
+                }
+            ]
+        }
+    ]
+}

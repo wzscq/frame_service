@@ -1,0 +1,257 @@
+{
+    "modelID": "lms_school", 
+    "fields": [
+        {
+            "field": "id", 
+            "name": "学校编号", 
+            "dataType": "varchar",
+            "quickSearch":true
+        }, 
+        {
+            "field": "name", 
+            "name": "学校名称", 
+            "dataType": "varchar",
+            "quickSearch":true
+        },
+        {
+            "field": "remark", 
+            "name": "备注", 
+            "dataType": "varchar",
+            "quickSearch":true
+        },
+        {
+            "field": "create_time", 
+            "name": "创建时间", 
+            "dataType": "datetime"
+        }, 
+        {
+            "field": "create_user", 
+            "name": "创建人", 
+            "dataType": "varchar"
+        }, 
+        {
+            "field": "update_time", 
+            "name": "更新时间", 
+            "dataType": "datetime"
+        }, 
+        {
+            "field": "update_user", 
+            "name": "更新人", 
+            "dataType": "varchar"
+        },  
+        {
+            "field": "version", 
+            "name": "数据版本", 
+            "dataType": "int"
+        }
+    ], 
+    "operations": [
+        {
+            "id": "create", 
+            "name": "创建",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:3003/index.html/#/lms_school/form1/FORM_TYPE_CREATE",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"创建角色",
+                    "key":"/model/lms_school/form1/create",
+                    "width":600,
+                    "height":400
+            },
+            "input":{},
+            "description":"打开创建学校对话框" 
+        }, 
+        {
+            "id": "edit", 
+            "name": "编辑",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:3003/index.html/#/lms_school/form1/FORM_TYPE_EDIT",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"编辑学校信息",
+                    "key":"/model/lms_school/form1/edit",
+                    "width":600,
+                    "height":400
+            },
+            "input":{},
+            "description":"打开学校编辑对话框"
+        },  
+        {
+            "id": "delete", 
+            "name": "删除",
+            "type":"OP_TYPE_REQUEST",
+            "params":{
+                "url":"/data/delete",
+                "method":"post"
+            },
+            "description":"删除选中数据",
+            "successOperation":{
+                "type":"OP_TYPE_MESSAGE",
+                "params":{
+                    "type":"success",
+                    "content":"删除成功!",
+                    "duration":"2"
+                },
+                "description":"提示删除数据成功",
+                "successOperation":{
+                    "type":"OP_TYPE_RELOAD_FRAME_DATA",
+                    "params":{
+                        "location":"LOCATION_TYPE_TAB",
+                        "key":"/model/lms_school"
+                    },
+                    "description":"刷新页面数据"
+                }
+            }
+        },
+        {
+            "id":"save",
+            "name":"保存",
+            "type":"OP_TYPE_REQUEST",
+            "params":{
+                "url":"/data/save",
+                "method":"post"
+            },
+            "description":"保存数据",
+            "successOperation":{
+                "type":"OP_TYPE_CLOSE",
+                "params":{
+                    "location":"LOCATION_TYPE_MODAL"
+                },
+                "input":{},
+                "description":"关闭对话框",
+                "successOperation":{
+                    "type":"OP_TYPE_RELOAD_FRAME_DATA",
+                    "params":{
+                        "location":"LOCATION_TYPE_TAB",
+                        "key":"/model/lms_school"
+                    },
+                    "description":"刷新页面数据"
+                }
+            }
+        }
+    ], 
+    "views": [
+        {
+            "viewID": "view1", 
+            "name": "学校信息维护", 
+            "description": "学校信息维护", 
+            "fields": [
+                {
+                    "field": "id", 
+                    "width": 100
+                }, 
+                {
+                    "field": "name", 
+                    "width": 200
+                },
+                {
+                    "field": "remark", 
+                    "width": 300
+                }, 
+                {
+                    "field": "create_time", 
+                    "width": 200
+                }, 
+                {
+                    "field": "create_user", 
+                    "width": 200
+                }, 
+                {
+                    "field": "update_time", 
+                    "width": 200
+                }, 
+                {
+                    "field": "update_user", 
+                    "width": 200
+                }, 
+                {
+                    "field": "version", 
+                    "width": 200
+                }
+            ], 
+            "filter": { }, 
+            "toolbar": {
+                "listToolbar": {
+                    "showCount": 3, 
+                    "buttons": [
+                        {
+                            "operationID": "create",
+                            "name":"创建学校"
+                        }
+                    ]
+                }, 
+                "rowToolbar": {
+                    "showCount": 2,
+                    "width":80, 
+                    "buttons": [
+                        {
+                            "operationID": "edit",
+                            "name":"编辑"
+                        },
+                        {
+                            "operationID": "delete",
+                            "name":"删除"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "forms":[
+        {
+            "formID": "form1",
+            "colCount": 4,
+            "rowCount": 2,
+            "rowHeight": 30,
+            "header":{
+                "label":"创建学校"
+            },
+            "footer":{
+                "operations":[
+                    {
+                        "operationID":"save",
+                        "name":"保存"
+                    },
+                    {
+                        "name":"关闭",
+                        "type":"OP_TYPE_CLOSE",
+                        "validateFormData":false,
+                        "params":{
+                            "location":"LOCATION_TYPE_MODAL"
+                        },
+                        "input":{},
+                        "description":"关闭对话框"                            
+                    }
+                ]
+            },
+            "controls": [
+                {
+                    "controlType": "Text",
+                    "row": 1,
+                    "col": 1,
+                    "field": "id", 
+                    "label": "ID",
+                    "colSpan": 1,
+                    "rowSpan": 1,
+                    "required":true
+                },
+                {
+                    "controlType": "Text",
+                    "row": 2,
+                    "col": 1,
+                    "field": "name", 
+                    "colSpan": 2,
+                    "rowSpan": 1
+                },
+                {
+                    "controlType": "Text",
+                    "row": 3,
+                    "col": 1,
+                    "field": "remark", 
+                    "colSpan": 4,
+                    "rowSpan": 2
+                }
+            ]
+        }
+    ]
+}

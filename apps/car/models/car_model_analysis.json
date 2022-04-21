@@ -1,0 +1,356 @@
+{
+    "modelID": "car_model_analysis", 
+    "fields": [
+        {
+            "field": "id", 
+            "name": "ID", 
+            "dataType": "int"
+        }, 
+        {
+            "field": "status", 
+            "name": "状态", 
+            "dataType": "varchar",
+            "quickSearch":true
+        },
+        {
+            "field": "model_type", 
+            "name": "类型", 
+            "dataType": "varchar",
+            "quickSearch":true
+        },
+        {
+            "field": "remark", 
+            "name": "备注", 
+            "dataType": "varchar",
+            "quickSearch":true
+        },
+        {
+            "field":"model_file",
+            "name": "模型文件",
+            "fieldType":"FILE"
+        },
+        {
+            "field":"data_file",
+            "name": "数据文件",
+            "fieldType":"FILE"
+        },
+        {
+            "field": "create_time", 
+            "name": "创建时间", 
+            "dataType": "datetime"
+        }, 
+        {
+            "field": "create_user", 
+            "name": "创建人", 
+            "dataType": "varchar"
+        }, 
+        {
+            "field": "update_time", 
+            "name": "更新时间", 
+            "dataType": "datetime"
+        }, 
+        {
+            "field": "update_user", 
+            "name": "更新人", 
+            "dataType": "varchar"
+        }, 
+        {
+            "field": "version", 
+            "name": "数据版本", 
+            "dataType": "int"
+        }
+    ], 
+    "operations": [   
+        {
+            "id": "delete", 
+            "name": "删除",
+            "type":"OP_TYPE_REQUEST",
+            "params":{
+                "url":"/data/delete",
+                "method":"post"
+            },
+            "description":"删除选中数据",
+            "successOperation":{
+                "type":"OP_TYPE_MESSAGE",
+                "params":{
+                    "type":"success",
+                    "content":"删除文件记录成功!",
+                    "duration":"2"
+                },
+                "description":"提示删除数据成功",
+                "successOperation":{
+                    "type":"OP_TYPE_RELOAD_FRAME_DATA",
+                    "params":{
+                        "location":"LOCATION_TYPE_TAB",
+                        "key":"/model/car_model_analysis"
+                    },
+                    "description":"刷新页面数据"
+                }
+            }
+        },
+        {
+            "id": "create", 
+            "name": "创建",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:3003/index.html/#/car_model_analysis/form1/FORM_TYPE_CREATE",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"创建动态模型",
+                    "key":"/model/car_model_analysis/form1/create",
+                    "width":800,
+                    "height":440
+            },
+            "input":{},
+            "description":"打开创建动态模型分析对话框" 
+        }, 
+        {
+            "id": "edit", 
+            "name": "编辑",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:3003/index.html/#/car_model_analysis/form1/FORM_TYPE_EDIT",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"动态模型分析",
+                    "key":"/model/car_model_analysis/form1/edit",
+                    "width":800,
+                    "height":450
+            },
+            "input":{},
+            "description":"打开动态模型分析对话框"
+        }, 
+        {
+            "id": "detail", 
+            "name": "查看详情",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:3003/index.html/#/car_model_analysis/form1/FORM_TYPE_DETAIL",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"动态模型分析",
+                    "key":"/model/car_model_analysis/form1/detail",
+                    "width":600,
+                    "height":400
+            },
+            "input":{},
+            "description":"打开动态模型分析详情对话框"
+        },
+        {
+            "id":"save",
+            "name":"保存",
+            "type":"OP_TYPE_REQUEST",
+            "params":{
+                "url":"/data/save",
+                "method":"post"
+            },
+            "description":"保存数据",
+            "successOperation":{
+                "type":"OP_TYPE_CLOSE",
+                "params":{
+                    "location":"LOCATION_TYPE_MODAL"
+                },
+                "input":{},
+                "description":"关闭对话框",
+                "successOperation":{
+                    "type":"OP_TYPE_RELOAD_FRAME_DATA",
+                    "params":{
+                        "location":"LOCATION_TYPE_TAB",
+                        "key":"/model/car_model_analysis"
+                    },
+                    "description":"刷新页面数据"
+                }
+            }
+        },
+        {
+            "id":"analyse",
+            "name": "启动分析",
+            "type":"OP_TYPE_REQUEST",
+            "params":{
+                "url":"/carservice/analyse",
+                "method":"post"
+            },
+            "description":"执行模型分析"
+        },
+        {
+            "id": "result", 
+            "name": "查看分析结果",
+            "type":"OP_TYPE_OPEN",
+            "params":{
+                    "url":"http://localhost:4001/index.html",
+                    "location":"LOCATION_TYPE_MODAL",
+                    "title":"模型分析结果",
+                    "key":"/model/car_model_analysis/form1/edit",
+                    "width":1024,
+                    "height":600
+            },
+            "input":{},
+            "description":"打开模型分析结果"
+        }
+    ], 
+    "views": [
+        {
+            "viewID": "view1", 
+            "name": "模型分析记录", 
+            "description": "查看模型分析结果", 
+            "fields": [
+                {
+                    "field": "id", 
+                    "width": 100
+                }, 
+                {
+                    "field": "status", 
+                    "width": 200
+                },
+                {
+                    "field": "model_type", 
+                    "width": 200
+                },
+                {
+                    "field": "remark", 
+                    "width": 300
+                }, 
+                {
+                    "field": "create_time", 
+                    "width": 200
+                }, 
+                {
+                    "field": "create_user", 
+                    "width": 200
+                }, 
+                {
+                    "field": "update_time", 
+                    "width": 200
+                }, 
+                {
+                    "field": "update_user", 
+                    "width": 200
+                }
+            ], 
+            "filter": { }, 
+            "toolbar": {
+                "listToolbar": {
+                    "showCount": 3, 
+                    "buttons": [
+                        {
+                            "operationID": "create",
+                            "name":"创建动态模型分析"
+                        },
+                        {
+                            "operationID": "delete",
+                            "name":"删除选中的分析记录",
+                            "prompt":"确定要删除当前选择的分析记录吗？"
+                        }
+                    ]
+                }, 
+                "rowToolbar": {
+                    "showCount": 2,
+                    "width":250, 
+                    "buttons": [ 
+                        {
+                            "operationID": "edit",
+                            "name":"编辑"
+                        },
+                        {
+                            "operationID": "detail",
+                            "name":"详情"
+                        },
+                        {
+                            "operationID": "analyse",
+                            "name":"启动分析"
+                        },
+                        {
+                            "operationID": "result",
+                            "name":"分析结果"
+                        },
+                        {
+                            "operationID": "delete",
+                            "name":"删除",
+                            "prompt":"确定要删除这个分析记录吗？"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "forms":[
+        {
+            "formID": "form1",
+            "colCount": 4,
+            "rowCount": 26,
+            "rowHeight": 30,
+            "header":{
+                "label":"动态模型分析"
+            },
+            "footer":{
+                "operations":[
+                    {
+                        "operationID":"save",
+                        "name":"保存"
+                    },
+                    {
+                        "name":"关闭",
+                        "type":"OP_TYPE_CLOSE",
+                        "validateFormData":false,
+                        "params":{
+                            "location":"LOCATION_TYPE_MODAL"
+                        },
+                        "input":{},
+                        "description":"关闭对话框"                            
+                    }
+                ]
+            },
+            "controls": [
+                {
+                    "controlType": "Text",
+                    "row": 1,
+                    "col": 1,
+                    "field": "status", 
+                    "colSpan": 1,
+                    "rowSpan": 1
+                }, 
+                {
+                    "controlType": "SingleSelect",
+                    "options":[
+                        {"value":"type1","label":"type1"},
+                        {"value":"type2","label":"type2"}
+                    ],
+                    "placeholder":"请选择模型类型",
+                    "required":true,
+                    "row": 1,
+                    "col": 2,
+                    "field": "model_type", 
+                    "colSpan": 1,
+                    "rowSpan": 1
+                }, 
+                {
+                    "controlType": "Text",
+                    "required":true,
+                    "row": 2,
+                    "col": 1,
+                    "field": "remark", 
+                    "colSpan": 4,
+                    "rowSpan": 2
+                },
+                {
+                    "controlType": "File",
+                    "required":true,
+                    "maxCount":2,
+                    "accept":".doc,.docx",
+                    "row": 4,
+                    "col": 1,
+                    "field": "model_file", 
+                    "colSpan": 4,
+                    "rowSpan": 1
+                },
+                {
+                    "controlType": "File",
+                    "maxCount":2,
+                    "accept":".doc,.docx",
+                    "row": 5,
+                    "col": 1,
+                    "field": "data_file", 
+                    "colSpan": 4,
+                    "rowSpan": 1
+                }
+            ]
+        }
+    ]
+}
