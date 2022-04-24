@@ -47,11 +47,6 @@ type operationConf struct {
 	ErrorOperation *operationConf `json:"errorOperation,omitempty"`
 }
 
-type viewFieldConf struct {
-	Field string `json:"field"`
-	Width int `json:"width"`
-}
-
 type buttonConf struct {
 	OperationID string `json:"operationID"`
 	Name string `json:"name"`
@@ -73,7 +68,7 @@ type viewConf struct {
 	ViewID string `json:"viewID"`
 	Name string `json:"name"`
 	Description string `json:"description"`
-	Fields []viewFieldConf `json:"fields"`
+	Fields []map[string]interface{} `json:"fields"`
 	Filter map[string]interface{} `json:"filter"`
 	Toolbar *viewToolbarConf `json:"toolbar,omitempty"`
 }
