@@ -4,6 +4,7 @@
 /node_modules
 /apps
 /appfile
+/conf
 /.pnp
 .pnp.js
 
