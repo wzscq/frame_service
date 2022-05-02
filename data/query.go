@@ -18,6 +18,7 @@ type field struct {
 	FieldType *string `json:"fieldType,omitempty"`
 	RelatedModelID *string `json:"relatedModelID,omitempty"`
 	RelatedField *string `json:"relatedField,omitempty"`
+	AssociationModelID *string `json:"associationModelID,omitempty"`
 	ViewID *string `json:"viewID,omitempty"`
 	Pagination *pagination `json:"pagination,omitempty"`
 	Filter *map[string]interface{} `json:"filter,omitempty"`

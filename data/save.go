@@ -327,16 +327,16 @@ func (save *Save) saveRow(dataRepository DataRepository,tx *sql.Tx,modelID strin
 	}
 }
 
-func (save *Save) saveList(dataRepository DataRepository,tx *sql.Tx,modelID string,list *[]map[string]interface{})(*saveResult,int) {
-	log.Println("start data save saveList")
+func (save *Save) SaveList(dataRepository DataRepository,tx *sql.Tx)(*saveResult,int) {
+	log.Println("start data save SaveList")
 	//循环执行每个行
-	if len(*list) == 0 {
+	if len(*save.List) == 0 {
 		return nil,common.ResultWrongRequest
 	}
 	var total int = 0
 	var resList []map[string]interface{}
-	for _, row := range *list {
-		res,errorcode:=save.saveRow(dataRepository, tx, modelID, row)
+	for _, row := range *(save.List) {
+		res,errorcode:=save.saveRow(dataRepository, tx, save.ModelID, row)
 		if errorcode == common.ResultSuccess {
 			//每一行的结果加入到数组中
 			resList=append(resList,res)
@@ -346,11 +346,11 @@ func (save *Save) saveList(dataRepository DataRepository,tx *sql.Tx,modelID stri
 		}
 	}
 	result:=&saveResult{
-		ModelID:modelID,
+		ModelID:save.ModelID,
 		Total:total,
 		List:resList,
 	}
-	log.Println("end data save saveList")
+	log.Println("end data save SaveList")
 	return result,common.ResultSuccess
 }
 
@@ -363,7 +363,7 @@ func (save *Save) Execute(dataRepository DataRepository)(*saveResult,int) {
 		return nil,common.ResultSQLError
 	}
 	//执行保存动作
-	result,errorcode:=save.saveList(dataRepository,tx,save.ModelID,save.List)
+	result,errorcode:=save.SaveList(dataRepository,tx)
 	if errorcode == common.ResultSuccess {
 		//提交事务
 		if err := tx.Commit(); err != nil {

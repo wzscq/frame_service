@@ -91,8 +91,10 @@ func (queryManyToMany *QueryManyToMany)query(dataRepository DataRepository,paren
 	}
 
 	filter:=queryManyToMany.getFilter(parentList,refField)
+
 	modelID:=*(refField.RelatedModelID)
-	modelID=getRelatedModelID(queryManyToMany.ModelID,modelID)
+	modelID=getRelatedModelID(queryManyToMany.ModelID,modelID,refField.AssociationModelID)
+	
 	fields:=queryManyToMany.getRelatedQueryFields(refField)
 	//执行查询，构造一个新的Query对象进行子表的查询，这样可以实现多层级数据表的递归查询操作
 	refQuery:=&Query{

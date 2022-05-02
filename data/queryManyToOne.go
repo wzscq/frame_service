@@ -46,6 +46,10 @@ func (queryManyToOne *QueryManyToOne)getFilter(parentList *queryResult,refField 
 	//查询时同时需要合并字段上本身携带的过滤条件
 	//首先获取用于过滤的ID列表
 	ids:=GetFieldValues(parentList,refField.Field)
+	if len(ids) == 0 {
+		return nil
+	}
+
 	inCon:=map[string]interface{}{}
 	inCon[Op_in]=ids
 	inClause:=map[string]interface{}{}
@@ -64,6 +68,11 @@ func (queryManyToOne *QueryManyToOne) query(dataRepository DataRepository,parent
 		return common.ResultNoRelatedModel
 	}
 	filter:=queryManyToOne.getFilter(parentList,refField)
+
+	if filter == nil {
+		return common.ResultSuccess
+	}
+	
 	//执行查询，构造一个新的Query对象进行子表的查询，这样可以实现多层级数据表的递归查询操作
 	refQuery:=&Query{
 		ModelID:*(refField.RelatedModelID),

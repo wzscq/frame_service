@@ -47,8 +47,13 @@ func (dr *DeleteReleated)deleteFile(dataRepository DataRepository,tx *sql.Tx)(in
 	return common.ResultSuccess
 }
 
-func (dr *DeleteReleated)deleteManyToMany(dataRepository DataRepository,tx *sql.Tx,relatedModelID string)(int){
-	midModelID:=getRelatedModelID(dr.ModelID,relatedModelID)
+func (dr *DeleteReleated)deleteManyToMany(
+	dataRepository DataRepository,
+	tx *sql.Tx,
+	relatedModelID string,
+	associationModelID *string)(int){
+	
+	midModelID:=getRelatedModelID(dr.ModelID,relatedModelID,associationModelID)
 	ids:=dr.getIds()
 	where:=dr.ModelID+"_id in ("+ids+")"
 	sql:="delete from "+dr.AppDB+"."+midModelID+" where "+where
@@ -86,7 +91,7 @@ func (dr *DeleteReleated)Execute(dataRepository DataRepository,tx *sql.Tx)(int) 
 			if field.RelatedModelID==nil {
 				return common.ResultNoRelatedModel
 			}
-			errorCode:=dr.deleteManyToMany(dataRepository,tx,*(field.RelatedModelID))
+			errorCode:=dr.deleteManyToMany(dataRepository,tx,*(field.RelatedModelID),field.AssociationModelID)
 			if errorCode!=common.ResultSuccess {
 				return errorCode
 			}

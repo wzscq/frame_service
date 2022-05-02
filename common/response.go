@@ -46,6 +46,9 @@ const (
 	ResultBase64DecodeError=10000028
 	ResultCreateFileError=10000029
 	ResultReadDirError=10000030
+	ResultPostExternalApiError=10000031
+	ResultNoExternalApiId=10000032
+	ResultNoExternalApiUrl=10000033
 )
 
 var errMsg = map[int]CommonResult{
@@ -293,6 +296,30 @@ var errMsg = map[int]CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultReadDirError,
 			Message:"访问文件夹时发生错误，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultPostExternalApiError:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultPostExternalApiError,
+			Message:"调用外部API失败，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultNoExternalApiId:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultNoExternalApiId,
+			Message:"调用外部API时为提供API标识，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultNoExternalApiUrl:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultNoExternalApiUrl,
+			Message:"调用外部API时缺少API配置，请与管理员联系处理",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	

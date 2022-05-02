@@ -20,19 +20,12 @@ func GetRelatedModelSaver(fieldType string,appDB string,userID string,fieldName 
 			UserID:userID,
 			FieldName:fieldName,
 		}
-	}
-	/* else if fieldType ==FIELDTYPE_ONE2MANY {
-		return &QueryOneToMany{
+	} else if fieldType ==FIELDTYPE_ONE2MANY {
+		return &SaveOneToMany{
 			AppDB:appDB,
+			UserID:userID,
 		}
-	} else if fieldType ==FIELDTYPE_MANY2ONE {
-		return &QueryManyToOne{
-			AppDB:appDB,
-		}
-	} else if fieldType == FIELDTYPE_FILE {
-		return &QueryFile{
-			AppDB:appDB,
-		}
-	}*/
+	} 
+	
 	return nil
 }

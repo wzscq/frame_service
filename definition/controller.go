@@ -34,6 +34,7 @@ type fieldConf struct {
 	FieldType *string `json:"fieldType,omitempty"`
 	RelatedModelID *string `json:"relatedModelID,omitempty"`
 	RelatedField *string `json:"relatedField,omitempty"`
+	AssociationModelID *string `json:"associationModelID,omitempty"`
 }
 
 type operationConf struct {

@@ -7,6 +7,7 @@ import (
     "crv/frame/definition"
     "crv/frame/data"
     "crv/frame/common"
+    "crv/frame/redirect"
     "time"
 )
 
@@ -45,10 +46,10 @@ func main() {
         LoginCache:loginCache,
         AppCache:appCache,
     }
-    userController.Bind(router);
+    userController.Bind(router)
     
     defController:=&definition.DefinitionController{}
-    defController.Bind(router);
+    defController.Bind(router)
 
     dataRepo:=&data.DefatultDataRepository{}
     dataRepo.Connect(
@@ -59,7 +60,9 @@ func main() {
     dataController:=&data.DataController{
         DataRepository:dataRepo,
     }
-    dataController.Bind(router);
+    dataController.Bind(router)
 
-    router.Run(conf.Service.Port);
+    redirectController:=&redirect.RedirectController{}
+    redirectController.Bind(router)
+    router.Run(conf.Service.Port)
 }

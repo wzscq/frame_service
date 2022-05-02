@@ -11,11 +11,19 @@ type QueryRelatedModel interface {
 	query(dataRepository DataRepository,parentList *queryResult,refField *field)(int)
 }
 
-func getRelatedModelID(modelID string,relatedModelID string)(string){
+func getRelatedModelID(
+	modelID string,
+	relatedModelID string,
+	associationModelID *string)(string){
+
+	if associationModelID!=nil {
+		return *associationModelID
+	}
+
 	if modelID >= relatedModelID {
 		return relatedModelID+"_"+modelID
 	}
-	return modelID+"_"+relatedModelID
+	return modelID+"_"+relatedModelID	
 }
 
 func GetRelatedModelQuerier(fieldType string,appDB string,modelID string)(QueryRelatedModel){
@@ -44,8 +52,10 @@ func GetRelatedModelQuerier(fieldType string,appDB string,modelID string)(QueryR
 func GetFieldValues(res *queryResult,fieldName string)([]string){
 	var valList []string
 	for _,row:=range res.List {
-		sVal:=row[fieldName].(string)
-		valList=append(valList,sVal)
+		if row[fieldName]!=nil {
+			sVal:=row[fieldName].(string)
+			valList=append(valList,sVal)
+		}
 	}
 	return valList
 }
