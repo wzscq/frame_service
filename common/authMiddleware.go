@@ -42,10 +42,17 @@ func AuthMiddleware(loginCache LoginCache,appCache AppCache) gin.HandlerFunc {
 						log.Println(err)
 						errorCode=ResultTokenExpired
 					} else {
-						//重新设置token是为了更新token的过期时间
-						loginCache.SetCache(userID,header.Token,appDB)
-						c.Set("userID",userID)	
-						c.Set("appDB",appDB)	
+						userRoles,err:=loginCache.GetUserRoles(header.Token)
+						if err != nil {
+							log.Println(err)
+							errorCode=ResultTokenExpired
+						} else {
+							//重新设置token是为了更新token的过期时间
+							loginCache.SetCache(userID,header.Token,appDB,userRoles)
+							c.Set("userID",userID)
+							c.Set("appDB",appDB)
+							c.Set("userRoles",userRoles)
+						}
 					}
 				}
 			}

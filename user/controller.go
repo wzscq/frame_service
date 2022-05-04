@@ -52,10 +52,22 @@ func (controller *UserController)checkUserPassword(userID string,password string
 	return user,common.ResultSuccess
 }
 
-func (controller *UserController)cacheLoginToken(userID string,token string,appDB string)(int){
+func (controller *UserController)getUserRoles(userID string,dbName string)(string,int){
+	roles,err:=controller.UserRepository.getUserRoles(userID,dbName)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "",common.ResultNoUserRole
+		}
+		return "",common.ResultAccessDBError
+	}
+		
+	return roles,common.ResultSuccess
+}
+
+func (controller *UserController)cacheLoginToken(userID string,token string,appDB string,userRoles string)(int){
 	controller.LoginCache.RemoveUser(userID)
 			
-	err:=controller.LoginCache.SetCache(userID,token,appDB)
+	err:=controller.LoginCache.SetCache(userID,token,appDB,userRoles)
 	if err != nil {
 		log.Println(err)
 		return common.ResultCreateTokenError
@@ -79,34 +91,56 @@ func (controller *UserController)getAppDB(appID string)(string,int){
 func (controller *UserController)login(c *gin.Context) {
 	log.Println("start user login")
 	var rep loginRep
-	var errorcode int
+	var errorCode int
 	var result *loginResult
 	if err := c.BindJSON(&rep); err != nil {
 		log.Println(err)
-		errorcode=common.ResultWrongRequest
-    } else {
-		log.Println(rep)
-		var appDB string
-		appDB,errorcode=controller.getAppDB(rep.AppID)
-		if(errorcode == common.ResultSuccess){
-			var user *User
-			user,errorcode=controller.checkUserPassword(rep.UserID,rep.Password,appDB)
-			if(errorcode == common.ResultSuccess){
-				token:=GetLoginToken()
-				errorcode=controller.cacheLoginToken(rep.UserID,token,appDB)
-				if errorcode == common.ResultSuccess {
-					result=&loginResult{
-						UserID:user.UserID,
-						UserName:user.UserNameZh,
-						Token:token,
-						AppID:rep.AppID,
-					}
-				}
-			}
-		}
+
+		rsp:=common.CreateResponse(common.ResultWrongRequest,result)
+		c.IndentedJSON(http.StatusOK, rsp.Rsp)
+		log.Println("end user login with error")
+		return 
+    }
+		
+	log.Println(rep)
+	var appDB string
+	appDB,errorCode=controller.getAppDB(rep.AppID)
+	if(errorCode != common.ResultSuccess){
+		rsp:=common.CreateResponse(errorCode,result)
+		c.IndentedJSON(http.StatusOK, rsp.Rsp)
+		log.Println("end user login with error")
+		return
+	}
+	
+	var user *User
+	user,errorCode=controller.checkUserPassword(rep.UserID,rep.Password,appDB)
+	if(errorCode != common.ResultSuccess){
+		rsp:=common.CreateResponse(errorCode,result)
+		c.IndentedJSON(http.StatusOK, rsp.Rsp)
+		log.Println("end user login with error")
+		return
 	}
 
-	rsp:=common.CreateResponse(errorcode,result)
+	userRoles,errorCode:=controller.getUserRoles(rep.UserID,appDB)
+	if(errorCode != common.ResultSuccess){
+		rsp:=common.CreateResponse(errorCode,result)
+		c.IndentedJSON(http.StatusOK, rsp.Rsp)
+		log.Println("end user login with error")
+		return
+	}
+	
+	token:=GetLoginToken()
+	errorCode=controller.cacheLoginToken(rep.UserID,token,appDB,userRoles)
+	if errorCode == common.ResultSuccess {
+		result=&loginResult{
+			UserID:user.UserID,
+			UserName:user.UserNameZh,
+			Token:token,
+			AppID:rep.AppID,
+		}
+	}
+		
+	rsp:=common.CreateResponse(errorCode,result)
 	c.IndentedJSON(http.StatusOK, rsp.Rsp)
 	log.Println("end user login")
 }

@@ -49,6 +49,7 @@ const (
 	ResultPostExternalApiError=10000031
 	ResultNoExternalApiId=10000032
 	ResultNoExternalApiUrl=10000033
+	ResultNoUserRole=10000034
 )
 
 var errMsg = map[int]CommonResult{
@@ -320,6 +321,14 @@ var errMsg = map[int]CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultNoExternalApiUrl,
 			Message:"调用外部API时缺少API配置，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultNoUserRole:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultNoUserRole,
+			Message:"当前用户尚未分配角色权限，请与管理员联系处理",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	

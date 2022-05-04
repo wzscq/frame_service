@@ -21,6 +21,7 @@ type User struct {
 type UserRepository interface {
 	getUser(userID string,dbName string)(*User,error)
 	updatePassword(userID string,password string,dbName string)(error)
+	getUserRoles(userID string,dbName string)(string,error)
 }
 
 type DefatultUserRepository struct {
@@ -41,6 +42,17 @@ func (repo *DefatultUserRepository)getUser(userID string,dbName string)(*User,er
 func (repo *DefatultUserRepository)updatePassword(userID string,password string,dbName string)(error){
 	_, err := repo.DB.Exec("update "+dbName+".core_user set password=? where id = ?", password,userID)
 	return err
+}
+
+func (repo *DefatultUserRepository)getUserRoles(userID string,dbName string)(string,error){
+	row := repo.DB.QueryRow("select GROUP_CONCAT(core_role_id) as roles from  "+dbName+".core_role_core_user where core_user_id = ? group by core_user_id", userID)
+	var roles string
+	if err := row.Scan(&roles); err != nil {
+        log.Println("get user error")
+		log.Println(err)
+        return "", err
+    }
+	return roles, nil
 }
 
 func (repo *DefatultUserRepository)Connect(server string,user string,password string,dbName string){
