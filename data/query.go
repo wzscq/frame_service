@@ -2,8 +2,10 @@ package data
 
 import (
 	"crv/frame/common"
+	"crv/frame/definition"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type pagination struct {
@@ -54,25 +56,31 @@ type Query struct {
 	Fields *[]field `json:"fields"`
 	AppDB string `json:"appDB"`
 	Sorter *[]sorter `json:"sorter"` 
+	UserRoles string `json:"userRoles"` 
 }
 
-func (query *Query) getQueryFields()(string,int) {
+func (query *Query) getQueryFields(permissionFields string)(string,int) {
 	var fields string
 	if query.Fields==nil||
 		len(*(query.Fields)) == 0 {
 		return fields,common.ResultQueryFieldNotFound
 	}
 
+	permissionFields=","+permissionFields+","
+
 	for _, field := range *(query.Fields) {
-		//由于MANY_TO_MANY和ONE_TO_MANY字段本身不对应实际数据库表中的字段，
-		//需要单独处理，所以先将这两个类型的字段过滤掉
-		if field.FieldType == nil {
-			fields=fields+field.Field+","
-		} else {
-			if *(field.FieldType) !=FIELDTYPE_MANY2MANY &&
-			*(field.FieldType) !=FIELDTYPE_ONE2MANY &&
-			*(field.FieldType) !=FIELDTYPE_FILE{
+		//判断是否拥有字段查询权限
+		if permissionFields==",*," || strings.Contains(permissionFields,","+field.Field+","){
+			//由于MANY_TO_MANY和ONE_TO_MANY字段本身不对应实际数据库表中的字段，
+			//需要单独处理，所以先将这两个类型的字段过滤掉
+			if field.FieldType == nil {
 				fields=fields+field.Field+","
+			} else {
+				if *(field.FieldType) !=FIELDTYPE_MANY2MANY &&
+				*(field.FieldType) !=FIELDTYPE_ONE2MANY &&
+				*(field.FieldType) !=FIELDTYPE_FILE{
+					fields=fields+field.Field+","
+				}
 			}
 		}
 	}
@@ -86,8 +94,23 @@ func (query *Query) getQueryFields()(string,int) {
 	return fields,common.ResultSuccess
 }
 
-func (query *Query) getQueryWhere()(string,int) {
-	return FilterToSQLWhere(query.Filter)
+func (query *Query) getQueryWhere(permissionFields *map[string]interface{})(string,int) {
+	if permissionFields == nil {
+		return FilterToSQLWhere(query.Filter)
+	}
+
+	if query.Filter == nil {
+		return FilterToSQLWhere(permissionFields)
+	}
+
+	filter:=&map[string]interface{}{
+		Op_and:[]interface{}{
+			*(query.Filter),
+			*permissionFields,
+		},
+	}
+
+	return FilterToSQLWhere(filter)
 }
 
 func (query *Query) getQueryLimit()(string,int) {
@@ -155,17 +178,29 @@ func (query *Query) getCount(sqlParam *sqlParam,dataRepository DataRepository)(i
 	return count,common.ResultSuccess
 }
 
-func (query *Query) getSqlParam()(*sqlParam,int) {
+func (query *Query) getSqlParam(withPermission bool)(*sqlParam,int) {
 	var sqlParam sqlParam
 	var errorcode int
-	
+
+	permissionDataset:=&definition.Dataset{
+		Fields:"*",
+		Filter:nil,
+	}
+	//获取用户模型数据权限
+	if withPermission {
+		permissionDataset,errorcode=definition.GetUserDataset(query.AppDB,query.ModelID,query.UserRoles,definition.DATA_OP_TYPE_QUERY)
+		if errorcode != common.ResultSuccess {
+			return nil,errorcode
+		}
+	}
+
 	//获取需要查询的数据字段，过滤掉多对多字段和一对多字段
-	sqlParam.Fields,errorcode=query.getQueryFields()
+	sqlParam.Fields,errorcode=query.getQueryFields(permissionDataset.Fields)
 	if errorcode != common.ResultSuccess {
 		return nil,errorcode
 	}
 
-	sqlParam.Where,errorcode=query.getQueryWhere()
+	sqlParam.Where,errorcode=query.getQueryWhere(permissionDataset.Filter)
 	if errorcode != common.ResultSuccess {
 		return nil,errorcode
 	}
@@ -183,7 +218,7 @@ func (query *Query) getSqlParam()(*sqlParam,int) {
 	return &sqlParam,errorcode
 }
 
-func (query *Query) query(dataRepository DataRepository)(*queryResult,int) {
+func (query *Query) query(dataRepository DataRepository,withPermission bool)(*queryResult,int) {
 	var errorcode int
 	result:=&queryResult{
 		ModelID:query.ModelID,
@@ -193,7 +228,7 @@ func (query *Query) query(dataRepository DataRepository)(*queryResult,int) {
 	}
 
 	var sqlParam *sqlParam 
-	sqlParam,errorcode=query.getSqlParam()
+	sqlParam,errorcode=query.getSqlParam(withPermission)
 	if errorcode != common.ResultSuccess {
 		return result,errorcode
 	}
@@ -214,7 +249,7 @@ func (query *Query) queryRelatedModels(dataRepository DataRepository,parentList 
 		//需要单独处理，所以先将这两个类型的字段过滤掉
 		if field.FieldType != nil {
 			fieldType:=*(field.FieldType)
-			querier:=GetRelatedModelQuerier(fieldType,query.AppDB,query.ModelID)
+			querier:=GetRelatedModelQuerier(fieldType,query.AppDB,query.ModelID,query.UserRoles)
 			errorcode:=querier.query(dataRepository,parentList,&field)
 			if errorcode!=common.ResultSuccess {
 				return errorcode
@@ -224,9 +259,9 @@ func (query *Query) queryRelatedModels(dataRepository DataRepository,parentList 
 	return common.ResultSuccess
 }
 
-func (query *Query) Execute(dataRepository DataRepository)(*queryResult,int) {
+func (query *Query) Execute(dataRepository DataRepository,withPermission bool)(*queryResult,int) {
 	//先查本表数据
-	result,errorcode:=query.query(dataRepository)
+	result,errorcode:=query.query(dataRepository,withPermission)
 	
 	//查询关联表数据
 	if errorcode==common.ResultSuccess && result.Total>0 {

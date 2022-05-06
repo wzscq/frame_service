@@ -6,6 +6,7 @@ import (
 
 type QueryManyToOne struct {
 	AppDB string `json:"appDB"`
+	UserRoles string `json:"userRoles"` 
 }
 
 func (queryManyToOne *QueryManyToOne)mergeResult(res *queryResult,relatedRes *queryResult,refField *field){
@@ -82,8 +83,9 @@ func (queryManyToOne *QueryManyToOne) query(dataRepository DataRepository,parent
 		Fields:refField.Fields,
 		AppDB:queryManyToOne.AppDB,
 		Sorter:refField.Sorter,
+		UserRoles:queryManyToOne.UserRoles,
 	}
-	result,errorcode:=refQuery.Execute(dataRepository)
+	result,errorcode:=refQuery.Execute(dataRepository,true)
 	//更新查询结果到父级数据列表中
 	if errorcode==common.ResultSuccess {
 		queryManyToOne.mergeResult(parentList,result,refField)

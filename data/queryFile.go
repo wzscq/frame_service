@@ -8,6 +8,7 @@ import (
 type QueryFile struct {
 	AppDB string `json:"appDB"`
 	ModelID string `json:"modelID"`
+	UserRoles string `json:"userRoles"` 
 }
 
 func (queryFile *QueryFile)mergeResult(res *queryResult,relatedRes *queryResult,refField *field){
@@ -117,8 +118,9 @@ func (queryFile *QueryFile) query(dataRepository DataRepository,parentList *quer
 		Fields:files,
 		AppDB:queryFile.AppDB,
 		Sorter:refField.Sorter,
+		UserRoles:queryFile.UserRoles,
 	}
-	result,errorcode:=fileQuery.Execute(dataRepository)
+	result,errorcode:=fileQuery.Execute(dataRepository,true)
 	//更新查询结果到父级数据列表中
 	if errorcode==common.ResultSuccess {
 		queryFile.mergeResult(parentList,result,refField)

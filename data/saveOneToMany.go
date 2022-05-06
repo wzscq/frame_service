@@ -9,6 +9,7 @@ import (
 type SaveOneToMany struct {
 	AppDB string `json:"appDB"`
 	UserID string `json:"userID"`
+	UserRoles string `json:"userRoles"`
 }
 
 func (save *SaveOneToMany)save(pID string,dataRepository DataRepository,tx *sql.Tx,modelID string,fieldValue map[string]interface{})(int){
@@ -55,6 +56,7 @@ func (save *SaveOneToMany)save(pID string,dataRepository DataRepository,tx *sql.
 		AppDB:save.AppDB,
 		UserID:save.UserID,
 		List:&rowList,
+		UserRoles:save.UserRoles,
 	}
 	_,errorCode:=saveRows.SaveList(dataRepository,tx)
 	log.Println("end SaveOneToMany save")

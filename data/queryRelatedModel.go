@@ -26,24 +26,28 @@ func getRelatedModelID(
 	return modelID+"_"+relatedModelID	
 }
 
-func GetRelatedModelQuerier(fieldType string,appDB string,modelID string)(QueryRelatedModel){
+func GetRelatedModelQuerier(fieldType string,appDB string,modelID string,userRoles string)(QueryRelatedModel){
 	if fieldType ==FIELDTYPE_MANY2MANY {
 		return &QueryManyToMany{
 			AppDB:appDB,
 			ModelID:modelID,
+			UserRoles:userRoles,
 		}
 	} else if fieldType ==FIELDTYPE_ONE2MANY {
 		return &QueryOneToMany{
 			AppDB:appDB,
+			UserRoles:userRoles,
 		}
 	} else if fieldType ==FIELDTYPE_MANY2ONE {
 		return &QueryManyToOne{
 			AppDB:appDB,
+			UserRoles:userRoles,
 		}
 	} else if fieldType == FIELDTYPE_FILE {
 		return &QueryFile{
 			AppDB:appDB,
 			ModelID:modelID,
+			UserRoles:userRoles,
 		}
 	}
 	return nil

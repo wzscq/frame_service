@@ -94,14 +94,14 @@ func convertObjectFilter(filter *map[string]interface{})(string,int){
             log.Printf("convertObjectFilter key %s \n", key)  
             switch key {
             case Op_or:
-                log.Printf("value type %T",value)
+                log.Println("value type %T",value)
                 mVal,err1:=value.([]interface{})
-                log.Printf("error:%b",err1)
+                log.Println("error:%b",err1)
                 str,err=convertArrayFilter("or",mVal)
             case Op_and:
-                log.Printf("value type %T",value)
+                log.Println("value type %T",value)
                 mVal,err1:=value.([]interface{})
-                log.Printf("error:%b",err1)
+                log.Println("error:%b",err1)
                 str,err=convertArrayFilter("and",mVal)
             default:
                 //字段

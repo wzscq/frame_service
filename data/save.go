@@ -2,6 +2,7 @@ package data
 
 import (
 	"crv/frame/common"
+	"crv/frame/definition"
 	"log"
 	"database/sql"
 	"time"
@@ -35,6 +36,7 @@ type Save struct {
 	List *[]map[string]interface{} `json:"list"` 
 	AppDB string `json:"appDB"`
 	UserID string `json:"userID"`
+	UserRoles string `json:"userRoles"`
 }
 
 func GetCreateCommonFieldsValues(userID string)(string,string){
@@ -86,13 +88,26 @@ func (save *Save)isIgnoreFieldCreate(field string)(bool){
 	return false
 }
 
-func (save *Save)getRowUpdateColumnValues(row map[string]interface{})(string,string,string,int){
+func (save *Save)getRowUpdateColumnValues(row map[string]interface{},permissionFields string)(string,string,string,int){
 	values:=""
 	strID:=""
 	version:=""
+	permissionFields=","+permissionFields+","
 	for key, value := range row {
 		//跳过操作类型字段和系统保留字段
 		if save.isIgnoreFieldUpdate(key) {
+			continue
+		}
+
+		//对于version和id字段，只是取出值用于更新数据的where条件部分使用，其值不用于更新
+		if key == CC_VERSION {
+			version=value.(string)
+		} else if key == CC_ID {
+			strID=value.(string)
+		}
+
+		//跳过没有权限的字段
+		if !(permissionFields==",*," || strings.Contains(permissionFields,","+key+",")) {
 			continue
 		}
 
@@ -100,14 +115,7 @@ func (save *Save)getRowUpdateColumnValues(row map[string]interface{})(string,str
 		switch v := value.(type) {
 		case string:
 			sVal, _ := value.(string)
-			//对于version和id字段，只是取出值用于更新数据的where条件部分使用，其值不用于更新
-			if key == CC_VERSION {
-				version=value.(string)
-			} else if key == CC_ID {
-				strID=value.(string)
-			} else {
-				values=values+key+"='"+sVal+"',"
-			}
+			values=values+key+"='"+sVal+"',"
 		case map[string]interface{}:
 			releatedField,ok:=value.(map[string]interface{})
 			if !ok {
@@ -189,7 +197,7 @@ func (save *Save)saveRelatedField(pID string,dataRepository DataRepository,tx *s
 			}
 
 			fieldType:=releatedField["fieldType"].(string)
-			saver:=GetRelatedModelSaver(fieldType,save.AppDB,save.UserID,key)	
+			saver:=GetRelatedModelSaver(fieldType,save.AppDB,save.UserID,key,save.UserRoles)	
 			
 			if saver==nil {
 				return common.ResultNotSupportedFieldType
@@ -206,7 +214,13 @@ func (save *Save)saveRelatedField(pID string,dataRepository DataRepository,tx *s
 	return common.ResultSuccess
 }
 
-func (save *Save)createRow(dataRepository DataRepository,tx *sql.Tx,modelID string,row map[string]interface{})(map[string]interface{},int) {
+func (save *Save)createRow(
+	dataRepository DataRepository,
+	tx *sql.Tx,
+	modelID string,
+	row map[string]interface{},
+	permissionDS *definition.Dataset)(map[string]interface{},int) {
+
 	log.Println("start data save createRow")
 	columns,values,strID,errCode:=save.getRowCreateColumnValues(row)
 	if errCode!=common.ResultSuccess{
@@ -241,7 +255,13 @@ func (save *Save)createRow(dataRepository DataRepository,tx *sql.Tx,modelID stri
 	return result,errorCode
 }
 
-func (save *Save) deleteRow(dataRepository DataRepository,tx *sql.Tx,modelID string,row map[string]interface{})(map[string]interface{},int) {
+func (save *Save) deleteRow(
+	dataRepository DataRepository,
+	tx *sql.Tx,
+	modelID string,
+	row map[string]interface{},
+	permissionDS *definition.Dataset)(map[string]interface{},int) {
+
 	rowID,ok:=row[CC_ID]
 	if !ok {
 		return nil,common.ResultNoIDWhenUpdate
@@ -252,10 +272,26 @@ func (save *Save) deleteRow(dataRepository DataRepository,tx *sql.Tx,modelID str
 		return nil,common.ResultNoIDWhenUpdate
 	}
 
-	sql:="delete from "+save.AppDB+"."+modelID+" where id='"+strID+"'"
-	_,_,err:=dataRepository.execWithTx(sql,tx)
+	//删除用户有权限的数据
+	permissionWhere:=""
+	errorCode:=common.ResultSuccess
+	if permissionDS.Filter !=nil {
+		permissionWhere,errorCode=FilterToSQLWhere(permissionDS.Filter)
+		if errorCode != common.ResultSuccess {
+			return nil,errorCode
+		}
+		permissionWhere=" and ( "+permissionWhere+" )"
+	}
+
+	sql:="delete from "+save.AppDB+"."+modelID+" where id='"+strID+"'"+permissionWhere
+	_,rowCount,err:=dataRepository.execWithTx(sql,tx)
 	if err != nil {
 		return nil,common.ResultSQLError
+	}
+
+	//没有删除数据的情况，可能是没有权限，也可能是本身就没有对应的数据
+	if rowCount == 0 {
+		return nil,common.ResultNotDeleteData
 	}
 
 	result := map[string]interface{}{}		
@@ -269,12 +305,18 @@ func (save *Save) deleteRow(dataRepository DataRepository,tx *sql.Tx,modelID str
 		UserID:save.UserID,
 		IdList:&idList,
 	}
-	errorCode:=dr.Execute(dataRepository,tx)
+	errorCode=dr.Execute(dataRepository,tx)
 	return result,errorCode
 }
 
-func (save *Save) updateRow(dataRepository DataRepository,tx *sql.Tx,modelID string,row map[string]interface{})(map[string]interface{},int) {
-	values,strID,version,errCode:=save.getRowUpdateColumnValues(row)
+func (save *Save) updateRow(
+	dataRepository DataRepository,
+	tx *sql.Tx,
+	modelID string,
+	row map[string]interface{},
+	permissionDS *definition.Dataset)(map[string]interface{},int) {
+
+	values,strID,version,errCode:=save.getRowUpdateColumnValues(row,permissionDS.Fields)
 	if errCode!=common.ResultSuccess{
 		return nil,errCode
 	}
@@ -287,8 +329,18 @@ func (save *Save) updateRow(dataRepository DataRepository,tx *sql.Tx,modelID str
 		return nil,common.ResultNoVersionWhenUpdate
 	}
 
+	//更新用户有权限的数据
+	permissionWhere:=""
+	if permissionDS.Filter !=nil {
+		permissionWhere,errCode=FilterToSQLWhere(permissionDS.Filter)
+		if errCode != common.ResultSuccess {
+			return nil,errCode
+		}
+		permissionWhere=" and ( "+permissionWhere+" )"
+	}
+
 	values=values+save.getUpdateCommonFieldsValues()
-	sql:="update "+save.AppDB+"."+modelID+" set "+values+" where id='"+strID+"' and version="+version
+	sql:="update "+save.AppDB+"."+modelID+" set "+values+" where id='"+strID+"' and version="+version+permissionWhere
 	
 	//执行sql
 	id,rowCount,err:=dataRepository.execWithTx(sql,tx)
@@ -296,7 +348,7 @@ func (save *Save) updateRow(dataRepository DataRepository,tx *sql.Tx,modelID str
 		return nil,common.ResultSQLError
 	}
 
-	//未能正确更新数据，一般是数据版本发生变更造成的
+	//未能正确更新数据，一般是数据版本发生变更或者用户权限不对造成的
 	if rowCount==0 {
 		return nil,common.ResultWrongDataVersion
 	}
@@ -313,15 +365,21 @@ func (save *Save) updateRow(dataRepository DataRepository,tx *sql.Tx,modelID str
 	return result,errorCode
 }
 
-func (save *Save) saveRow(dataRepository DataRepository,tx *sql.Tx,modelID string,row map[string]interface{})(map[string]interface{},int) {
+func (save *Save) saveRow(
+	dataRepository DataRepository,
+	tx *sql.Tx,
+	modelID string,
+	row map[string]interface{},
+	permissionDS *definition.Dataset)(map[string]interface{},int) {
+	
 	saveType:=row[SAVE_TYPE_COLUMN]
 	switch saveType {
 		case SAVE_CREATE:
-			return save.createRow(dataRepository,tx,modelID,row)
+			return save.createRow(dataRepository,tx,modelID,row,permissionDS)
 		case SAVE_DELETE:
-			return save.deleteRow(dataRepository,tx,modelID,row)
+			return save.deleteRow(dataRepository,tx,modelID,row,permissionDS)
 		case SAVE_UPDATE:
-			return save.updateRow(dataRepository,tx,modelID,row)
+			return save.updateRow(dataRepository,tx,modelID,row,permissionDS)
 		default:
 			return nil,common.ResultNotSupportedSaveType
 	}
@@ -333,10 +391,17 @@ func (save *Save) SaveList(dataRepository DataRepository,tx *sql.Tx)(*saveResult
 	if len(*save.List) == 0 {
 		return nil,common.ResultWrongRequest
 	}
+
+	//获取用户权限
+	permissionDataset,errorCode:=definition.GetUserDataset(save.AppDB,save.ModelID,save.UserRoles,definition.DATA_OP_TYPE_MUTATION)
+	if errorCode != common.ResultSuccess {
+		return nil,errorCode
+	}
+
 	var total int = 0
 	var resList []map[string]interface{}
 	for _, row := range *(save.List) {
-		res,errorcode:=save.saveRow(dataRepository, tx, save.ModelID, row)
+		res,errorcode:=save.saveRow(dataRepository, tx, save.ModelID, row,permissionDataset)
 		if errorcode == common.ResultSuccess {
 			//每一行的结果加入到数组中
 			resList=append(resList,res)
@@ -356,6 +421,7 @@ func (save *Save) SaveList(dataRepository DataRepository,tx *sql.Tx)(*saveResult
 
 func (save *Save) Execute(dataRepository DataRepository)(*saveResult,int) {
 	log.Println("start data save Execute")
+	
 	//开启事务
 	tx,err:= dataRepository.begin()
 	if err != nil {

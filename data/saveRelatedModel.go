@@ -8,7 +8,7 @@ type SaveRelatedModel interface {
 	save(pID string,dataRepository DataRepository,tx *sql.Tx,modelID string,fieldValue map[string]interface{})(int)
 }
 
-func GetRelatedModelSaver(fieldType string,appDB string,userID string,fieldName string)(SaveRelatedModel){
+func GetRelatedModelSaver(fieldType string,appDB string,userID string,fieldName string,userRoles string)(SaveRelatedModel){
 	if fieldType ==FIELDTYPE_MANY2MANY {
 		return &SaveManyToMany{
 			AppDB:appDB,
@@ -24,6 +24,7 @@ func GetRelatedModelSaver(fieldType string,appDB string,userID string,fieldName 
 		return &SaveOneToMany{
 			AppDB:appDB,
 			UserID:userID,
+			UserRoles:userRoles,
 		}
 	} 
 	
