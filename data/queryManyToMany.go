@@ -7,6 +7,7 @@ import (
 type QueryManyToMany struct {
 	AppDB string `json:"appDB"`
 	ModelID string `json:"modelID"`
+	UserRoles string `json:"userRoles"` 
 }
 
 func (queryManyToMany *QueryManyToMany)mergeResult(res *queryResult,relatedRes *queryResult,refField *field){
@@ -34,11 +35,13 @@ func (queryManyToMany *QueryManyToMany)mergeResult(res *queryResult,relatedRes *
 			}
 			//这里的关联字段本身的值是一个多对一字段，这里取出其中的值
 			if row["id"] == relatedRow[localRelatedFieldName] {
-				relatedValue:=relatedRow[relatedFieldName].(*queryResult)
-				value.(*queryResult).Total+=relatedValue.Total
-				//对于多对多字段来说，这里不是取中间表的数据，而是取中间表关联的下一层表的数据
-				if relatedValue.Total>0 {
-					value.(*queryResult).List=append(value.(*queryResult).List,relatedValue.List...)
+				relatedValue,ok:=relatedRow[relatedFieldName].(*queryResult)
+				if ok {
+					value.(*queryResult).Total+=relatedValue.Total
+					//对于多对多字段来说，这里不是取中间表的数据，而是取中间表关联的下一层表的数据
+					if relatedValue.Total>0 {
+						value.(*queryResult).List=append(value.(*queryResult).List,relatedValue.List...)
+					}
 				}
 			}
 		}
@@ -102,8 +105,9 @@ func (queryManyToMany *QueryManyToMany)query(dataRepository DataRepository,paren
 		Filter:filter,
 		Fields:fields,
 		AppDB:queryManyToMany.AppDB,
+		UserRoles:queryManyToMany.UserRoles,
 	}
-	result,errorcode:=refQuery.Execute(dataRepository)
+	result,errorcode:=refQuery.Execute(dataRepository,false)
 	//更新查询结果到父级数据列表中
 	if errorcode==common.ResultSuccess {
 		queryManyToMany.mergeResult(parentList,result,refField)

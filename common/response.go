@@ -50,6 +50,8 @@ const (
 	ResultNoExternalApiId=10000032
 	ResultNoExternalApiUrl=10000033
 	ResultNoUserRole=10000034
+	ResultNoPermission=10000035
+	ResultNotDeleteData=10000036
 )
 
 var errMsg = map[int]CommonResult{
@@ -216,7 +218,7 @@ var errMsg = map[int]CommonResult{
 	ResultWrongDataVersion:CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultWrongDataVersion,
-			Message:"您提交的数据中包含的版本已过期，请刷新页面数据后重新尝试",
+			Message:"您没有修改数据的权限或数据已被其他用户修改，请刷新页面数据后重新尝试",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	
@@ -329,6 +331,22 @@ var errMsg = map[int]CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultNoUserRole,
 			Message:"当前用户尚未分配角色权限，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultNoPermission:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultNoPermission,
+			Message:"您没有权限完成当前数据操作，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultNotDeleteData:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultNotDeleteData,
+			Message:"删除数据失败，数据不存在或您没有权限删除相应数据",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	

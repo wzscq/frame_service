@@ -25,7 +25,7 @@ type DataController struct {
 func (controller *DataController) query(c *gin.Context) {
 	log.Println("start data query")
 	//获取用户账号
-	//userID:= c.MustGet("userID").(string)
+	userRoles:= c.MustGet("userRoles").(string)
 	appDB:= c.MustGet("appDB").(string)
 	var rep commonRep
 	var errorcode int
@@ -42,8 +42,9 @@ func (controller *DataController) query(c *gin.Context) {
 			Fields:rep.Fields,
 			AppDB:appDB,
 			Sorter:rep.Sorter,
+			UserRoles:userRoles,
 		}
-		result,errorcode=query.Execute(controller.DataRepository)
+		result,errorcode=query.Execute(controller.DataRepository,true)
 	}
 	rsp:=common.CreateResponse(errorcode,result)
 	c.IndentedJSON(http.StatusOK, rsp.Rsp)
@@ -53,6 +54,7 @@ func (controller *DataController) query(c *gin.Context) {
 func (controller *DataController) save(c *gin.Context) {
 	log.Println("start data save")
 	//获取用户账号
+	userRoles:= c.MustGet("userRoles").(string)
 	userID:= c.MustGet("userID").(string)
 	appDB:= c.MustGet("appDB").(string)
 	var rep commonRep
@@ -80,6 +82,7 @@ func (controller *DataController) save(c *gin.Context) {
 		AppDB:appDB,
 		UserID:userID,
 		List:rep.List,
+		UserRoles:userRoles,
 	}
 	result,errorcode=save.Execute(controller.DataRepository)
 	rsp:=common.CreateResponse(errorcode,result)
@@ -91,6 +94,7 @@ func (controller *DataController) delete(c *gin.Context) {
 	log.Println("start data delete")
 	//获取用户账号
 	userID:= c.MustGet("userID").(string)
+	userRoles:= c.MustGet("userRoles").(string)
 	appDB:= c.MustGet("appDB").(string)
 	var rep commonRep
 	var errorcode int
@@ -117,6 +121,7 @@ func (controller *DataController) delete(c *gin.Context) {
 		AppDB:appDB,
 		UserID:userID,
 		SelectedRowKeys:rep.SelectedRowKeys,
+		UserRoles:userRoles,
 	}
 	result,errorcode=delete.Execute(controller.DataRepository)
 	rsp:=common.CreateResponse(errorcode,result)

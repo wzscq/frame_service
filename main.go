@@ -9,9 +9,12 @@ import (
     "crv/frame/common"
     "crv/frame/redirect"
     "time"
+    "log"
 )
 
 func main() {
+    //设置log打印文件名和行号
+    log.SetFlags(log.Lshortfile | log.LstdFlags)
     //初始化配置
     conf:=common.InitConfig()
 
