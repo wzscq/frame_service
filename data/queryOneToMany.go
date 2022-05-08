@@ -76,11 +76,11 @@ func (queryOneToMany *QueryOneToMany) query(dataRepository DataRepository,parent
 		Sorter:refField.Sorter,
 		UserRoles:queryOneToMany.UserRoles,
 	}
-	result,errorcode:=refQuery.Execute(dataRepository,true)
+	result,errorCode:=refQuery.Execute(dataRepository,true)
 	//更新查询结果到父级数据列表中
-	if errorcode==common.ResultSuccess {
+	if errorCode==common.ResultSuccess {
 		queryOneToMany.mergeResult(parentList,result,refField)
 	}
-	return errorcode
+	return errorCode
 }
 

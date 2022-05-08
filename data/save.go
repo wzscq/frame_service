@@ -401,13 +401,13 @@ func (save *Save) SaveList(dataRepository DataRepository,tx *sql.Tx)(*saveResult
 	var total int = 0
 	var resList []map[string]interface{}
 	for _, row := range *(save.List) {
-		res,errorcode:=save.saveRow(dataRepository, tx, save.ModelID, row,permissionDataset)
-		if errorcode == common.ResultSuccess {
+		res,errorCode:=save.saveRow(dataRepository, tx, save.ModelID, row,permissionDataset)
+		if errorCode == common.ResultSuccess {
 			//每一行的结果加入到数组中
 			resList=append(resList,res)
 			total++
 		} else {
-			return nil,errorcode
+			return nil,errorCode
 		}
 	}
 	result:=&saveResult{
@@ -429,17 +429,17 @@ func (save *Save) Execute(dataRepository DataRepository)(*saveResult,int) {
 		return nil,common.ResultSQLError
 	}
 	//执行保存动作
-	result,errorcode:=save.SaveList(dataRepository,tx)
-	if errorcode == common.ResultSuccess {
+	result,errorCode:=save.SaveList(dataRepository,tx)
+	if errorCode == common.ResultSuccess {
 		//提交事务
 		if err := tx.Commit(); err != nil {
 			log.Println(err)
-			errorcode=common.ResultSQLError
+			errorCode=common.ResultSQLError
 		}
 	} else {
 		tx.Rollback()
 	}
 	log.Println("end data save Execute")
-	return result,errorcode
+	return result,errorCode
 }
 

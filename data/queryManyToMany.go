@@ -107,11 +107,12 @@ func (queryManyToMany *QueryManyToMany)query(dataRepository DataRepository,paren
 		AppDB:queryManyToMany.AppDB,
 		UserRoles:queryManyToMany.UserRoles,
 	}
-	result,errorcode:=refQuery.Execute(dataRepository,false)
+	result,errorCode:=refQuery.Execute(dataRepository,false)
 	//更新查询结果到父级数据列表中
-	if errorcode==common.ResultSuccess {
+	if errorCode==common.ResultSuccess {
 		queryManyToMany.mergeResult(parentList,result,refField)
 	}
-	return errorcode
+	return errorCode
+	
 }
 

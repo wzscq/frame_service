@@ -18,9 +18,9 @@ type Delete struct {
 func (delete *Delete)getPermissionIds(dataRepository DataRepository,idList *[]string)(string,int){
 	log.Println("start getPermissionIds")
 	//根据用户权限，获取允许删除数据的id列表
-	permissionDataset,errorcode:=definition.GetUserDataset(delete.AppDB,delete.ModelID,delete.UserRoles,definition.DATA_OP_TYPE_MUTATION)
-	if errorcode != common.ResultSuccess {
-		return "",errorcode
+	permissionDataset,errorCode:=definition.GetUserDataset(delete.AppDB,delete.ModelID,delete.UserRoles,definition.DATA_OP_TYPE_MUTATION)
+	if errorCode != common.ResultSuccess {
+		return "",errorCode
 	}
 
 	if permissionDataset.Filter ==  nil {
@@ -49,7 +49,7 @@ func (delete *Delete)getPermissionIds(dataRepository DataRepository,idList *[]st
 		AppDB:delete.AppDB,
 		UserRoles:delete.UserRoles,
 	}
-	result,errorcode:=query.Execute(dataRepository,false)
+	result,errorCode:=query.Execute(dataRepository,false)
 
 	if len(result.List) == 0 {
 		log.Println("end getPermissionIds with no permission")
@@ -118,16 +118,16 @@ func (delete *Delete) Execute(dataRepository DataRepository)(*map[string]interfa
 		return nil,common.ResultSQLError
 	}
 	//执行删除动作
-	result,errorcode:=delete.delete(dataRepository,tx,delete.ModelID,delete.SelectedRowKeys)
-	if errorcode == common.ResultSuccess {
+	result,errorCode:=delete.delete(dataRepository,tx,delete.ModelID,delete.SelectedRowKeys)
+	if errorCode == common.ResultSuccess {
 		//提交事务
 		if err := tx.Commit(); err != nil {
 			log.Println(err)
-			errorcode=common.ResultSQLError
+			errorCode=common.ResultSQLError
 		}
 	} else {
 		tx.Rollback()
 	}
-	return result,errorcode
+	return result,errorCode
 }
 

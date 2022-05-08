@@ -28,11 +28,11 @@ func (controller *DataController) query(c *gin.Context) {
 	userRoles:= c.MustGet("userRoles").(string)
 	appDB:= c.MustGet("appDB").(string)
 	var rep commonRep
-	var errorcode int
+	var errorCode int
 	var result *queryResult
 	if err := c.BindJSON(&rep); err != nil {
 		log.Println(err)
-		errorcode=common.ResultWrongRequest
+		errorCode=common.ResultWrongRequest
     } else {
 		query:=&Query{
 			ModelID:rep.ModelID,
@@ -44,9 +44,9 @@ func (controller *DataController) query(c *gin.Context) {
 			Sorter:rep.Sorter,
 			UserRoles:userRoles,
 		}
-		result,errorcode=query.Execute(controller.DataRepository,true)
+		result,errorCode=query.Execute(controller.DataRepository,true)
 	}
-	rsp:=common.CreateResponse(errorcode,result)
+	rsp:=common.CreateResponse(errorCode,result)
 	c.IndentedJSON(http.StatusOK, rsp.Rsp)
 	log.Println("end data query")
 }
@@ -58,20 +58,20 @@ func (controller *DataController) save(c *gin.Context) {
 	userID:= c.MustGet("userID").(string)
 	appDB:= c.MustGet("appDB").(string)
 	var rep commonRep
-	var errorcode int
+	var errorCode int
 	var result *saveResult
 	if err := c.BindJSON(&rep); err != nil {
 		log.Println(err)
-		errorcode=common.ResultWrongRequest
-		rsp:=common.CreateResponse(errorcode,result)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,result)
 		c.IndentedJSON(http.StatusOK, rsp.Rsp)
 		log.Println("end data save with error")
 		return
     }
 		
 	if rep.List==nil{
-		errorcode=common.ResultWrongRequest
-		rsp:=common.CreateResponse(errorcode,result)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,result)
 		c.IndentedJSON(http.StatusOK, rsp.Rsp)
 		log.Println("end data save with error")
 		return
@@ -84,8 +84,8 @@ func (controller *DataController) save(c *gin.Context) {
 		List:rep.List,
 		UserRoles:userRoles,
 	}
-	result,errorcode=save.Execute(controller.DataRepository)
-	rsp:=common.CreateResponse(errorcode,result)
+	result,errorCode=save.Execute(controller.DataRepository)
+	rsp:=common.CreateResponse(errorCode,result)
 	c.IndentedJSON(http.StatusOK, rsp.Rsp)
 	log.Println("end data save success")
 }
@@ -97,20 +97,20 @@ func (controller *DataController) delete(c *gin.Context) {
 	userRoles:= c.MustGet("userRoles").(string)
 	appDB:= c.MustGet("appDB").(string)
 	var rep commonRep
-	var errorcode int
+	var errorCode int
 	var result *map[string]interface {} = nil
 	if err := c.BindJSON(&rep); err != nil {
 		log.Println(err)
-		errorcode=common.ResultWrongRequest
-		rsp:=common.CreateResponse(errorcode,result)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,result)
 		c.IndentedJSON(http.StatusOK, rsp.Rsp)
 		log.Println("end data delete with error")
 		return
     }
 
 	if rep.SelectedRowKeys == nil {
-		errorcode=common.ResultWrongRequest
-		rsp:=common.CreateResponse(errorcode,result)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,result)
 		c.IndentedJSON(http.StatusOK, rsp.Rsp)
 		log.Println("end data delete with error")
 		return
@@ -123,8 +123,8 @@ func (controller *DataController) delete(c *gin.Context) {
 		SelectedRowKeys:rep.SelectedRowKeys,
 		UserRoles:userRoles,
 	}
-	result,errorcode=delete.Execute(controller.DataRepository)
-	rsp:=common.CreateResponse(errorcode,result)
+	result,errorCode=delete.Execute(controller.DataRepository)
+	rsp:=common.CreateResponse(errorCode,result)
 	c.IndentedJSON(http.StatusOK, rsp.Rsp)
 	log.Println("end data save")
 }
@@ -139,20 +139,20 @@ func (controller *DataController)download(c *gin.Context) {
 	userID:= c.MustGet("userID").(string)
 	appDB:= c.MustGet("appDB").(string)
 	var rep commonRep
-	var errorcode int
+	var errorCode int
 	var result *map[string]interface {} = nil
 	if err := c.BindJSON(&rep); err != nil {
 		log.Println(err)
-		errorcode=common.ResultWrongRequest
-		rsp:=common.CreateResponse(errorcode,result)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,result)
 		c.IndentedJSON(http.StatusInternalServerError, rsp.Rsp)
 		log.Println("end data download with error")
 		return
     }
 
 	if rep.List == nil || len(*(rep.List))<=0 {
-		errorcode=common.ResultWrongRequest
-		rsp:=common.CreateResponse(errorcode,result)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,result)
 		c.IndentedJSON(http.StatusInternalServerError, rsp.Rsp)
 		log.Println("end data download with error")
 		return
@@ -169,9 +169,9 @@ func (controller *DataController)download(c *gin.Context) {
     c.Header("Content-Disposition", "attachment; filename=downloadFile")
     c.Header("Content-Transfer-Encoding", "binary")
 
-	errorCode:=download.Execute(c.Writer)
+	errorCode=download.Execute(c.Writer)
 	if errorCode!=common.ResultSuccess {
-		rsp:=common.CreateResponse(errorcode,result)
+		rsp:=common.CreateResponse(errorCode,result)
 		c.IndentedJSON(http.StatusInternalServerError, rsp.Rsp)
 	}
 	log.Println("end data download")

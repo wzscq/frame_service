@@ -180,7 +180,7 @@ func (query *Query) getCount(sqlParam *sqlParam,dataRepository DataRepository)(i
 
 func (query *Query) getSqlParam(withPermission bool)(*sqlParam,int) {
 	var sqlParam sqlParam
-	var errorcode int
+	var errorCode int
 
 	permissionDataset:=&definition.Dataset{
 		Fields:"*",
@@ -188,38 +188,38 @@ func (query *Query) getSqlParam(withPermission bool)(*sqlParam,int) {
 	}
 	//获取用户模型数据权限
 	if withPermission {
-		permissionDataset,errorcode=definition.GetUserDataset(query.AppDB,query.ModelID,query.UserRoles,definition.DATA_OP_TYPE_QUERY)
-		if errorcode != common.ResultSuccess {
-			return nil,errorcode
+		permissionDataset,errorCode=definition.GetUserDataset(query.AppDB,query.ModelID,query.UserRoles,definition.DATA_OP_TYPE_QUERY)
+		if errorCode != common.ResultSuccess {
+			return nil,errorCode
 		}
 	}
 
 	//获取需要查询的数据字段，过滤掉多对多字段和一对多字段
-	sqlParam.Fields,errorcode=query.getQueryFields(permissionDataset.Fields)
-	if errorcode != common.ResultSuccess {
-		return nil,errorcode
+	sqlParam.Fields,errorCode=query.getQueryFields(permissionDataset.Fields)
+	if errorCode != common.ResultSuccess {
+		return nil,errorCode
 	}
 
-	sqlParam.Where,errorcode=query.getQueryWhere(permissionDataset.Filter)
-	if errorcode != common.ResultSuccess {
-		return nil,errorcode
+	sqlParam.Where,errorCode=query.getQueryWhere(permissionDataset.Filter)
+	if errorCode != common.ResultSuccess {
+		return nil,errorCode
 	}
 			
-	sqlParam.Sorter,errorcode=query.getQuerySorter()
-	if errorcode != common.ResultSuccess {
-		return nil,errorcode
+	sqlParam.Sorter,errorCode=query.getQuerySorter()
+	if errorCode != common.ResultSuccess {
+		return nil,errorCode
 	}
 	
-	sqlParam.Limit,errorcode=query.getQueryLimit()
-	if errorcode != common.ResultSuccess {
-		return nil,errorcode
+	sqlParam.Limit,errorCode=query.getQueryLimit()
+	if errorCode != common.ResultSuccess {
+		return nil,errorCode
 	}
 
-	return &sqlParam,errorcode
+	return &sqlParam,errorCode
 }
 
 func (query *Query) query(dataRepository DataRepository,withPermission bool)(*queryResult,int) {
-	var errorcode int
+	var errorCode int
 	result:=&queryResult{
 		ModelID:query.ModelID,
 		ViewID:query.ViewID,
@@ -228,18 +228,18 @@ func (query *Query) query(dataRepository DataRepository,withPermission bool)(*qu
 	}
 
 	var sqlParam *sqlParam 
-	sqlParam,errorcode=query.getSqlParam(withPermission)
-	if errorcode != common.ResultSuccess {
-		return result,errorcode
+	sqlParam,errorCode=query.getSqlParam(withPermission)
+	if errorCode != common.ResultSuccess {
+		return result,errorCode
 	}
 
-	result.Total,errorcode=query.getCount(sqlParam,dataRepository)
-	if errorcode != common.ResultSuccess {
-		return result,errorcode
+	result.Total,errorCode=query.getCount(sqlParam,dataRepository)
+	if errorCode != common.ResultSuccess {
+		return result,errorCode
 	}
 			
-	result.List,errorcode=query.getData(sqlParam,dataRepository)
-	return result,errorcode
+	result.List,errorCode=query.getData(sqlParam,dataRepository)
+	return result,errorCode
 }
 
 func (query *Query) queryRelatedModels(dataRepository DataRepository,parentList *queryResult)(int) {
@@ -250,9 +250,9 @@ func (query *Query) queryRelatedModels(dataRepository DataRepository,parentList 
 		if field.FieldType != nil {
 			fieldType:=*(field.FieldType)
 			querier:=GetRelatedModelQuerier(fieldType,query.AppDB,query.ModelID,query.UserRoles)
-			errorcode:=querier.query(dataRepository,parentList,&field)
-			if errorcode!=common.ResultSuccess {
-				return errorcode
+			errorCode:=querier.query(dataRepository,parentList,&field)
+			if errorCode!=common.ResultSuccess {
+				return errorCode
 			}
 		}
 	}
@@ -261,12 +261,12 @@ func (query *Query) queryRelatedModels(dataRepository DataRepository,parentList 
 
 func (query *Query) Execute(dataRepository DataRepository,withPermission bool)(*queryResult,int) {
 	//先查本表数据
-	result,errorcode:=query.query(dataRepository,withPermission)
+	result,errorCode:=query.query(dataRepository,withPermission)
 	
 	//查询关联表数据
-	if errorcode==common.ResultSuccess && result.Total>0 {
-		errorcode=query.queryRelatedModels(dataRepository,result)
+	if errorCode==common.ResultSuccess && result.Total>0 {
+		errorCode=query.queryRelatedModels(dataRepository,result)
 	}
 
-	return result,errorcode
+	return result,errorCode
 }
