@@ -177,6 +177,45 @@ func (controller *DataController)download(c *gin.Context) {
 	log.Println("end data download")
 }
 
+func (controller *DataController)getImage(c *gin.Context) {
+	log.Println("start data getImage")
+	//获取用户账号
+	userID:= c.MustGet("userID").(string)
+	appDB:= c.MustGet("appDB").(string)
+	var rep commonRep
+	var errorCode int
+	
+	if err := c.BindJSON(&rep); err != nil {
+		log.Println(err)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,nil)
+		c.IndentedJSON(http.StatusOK, rsp.Rsp)
+		log.Println("end data getImage with error")
+		return
+    }
+
+	if rep.List == nil || len(*(rep.List))<=0 {
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,nil)
+		c.IndentedJSON(http.StatusOK, rsp.Rsp)
+		log.Println("end data getImage with error")
+		return
+	}
+
+	imageFile:=&ImageFile{
+		ModelID:rep.ModelID,
+		AppDB:appDB,
+		UserID:userID,
+		List:rep.List,
+	}
+
+	result,errorCode:=imageFile.getImages()
+	rsp:=common.CreateResponse(errorCode,result)
+	c.IndentedJSON(http.StatusOK, rsp.Rsp)
+	
+	log.Println("end getImage download")
+}
+
 func (controller *DataController) Bind(router *gin.Engine) {
 	log.Println("Bind DataController")
 	router.POST("/data/query", controller.query)
@@ -184,4 +223,5 @@ func (controller *DataController) Bind(router *gin.Engine) {
 	router.POST("/data/delete", controller.delete)
 	router.POST("/data/update", controller.update)
 	router.POST("/data/download", controller.download)
+	router.POST("/data/getImage", controller.getImage)
 }

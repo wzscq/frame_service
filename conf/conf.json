@@ -3,13 +3,13 @@
         "server":"121.37.174.251:6479",
         "tokenExpired":"6000s"
     },
-    "mysql_huawei":{
+    "mysql":{
         "server":"121.37.174.251:4306",
         "password":"123456",
         "user":"root",
         "dbName":"car"
     },
-    "mysql":{
+    "mysql_car":{
         "server":"121.36.222.9:4306",
         "password":"123456",
         "user":"root",
