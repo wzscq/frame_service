@@ -94,19 +94,19 @@ func (query *Query) getQueryFields(permissionFields string)(string,int) {
 	return fields,common.ResultSuccess
 }
 
-func (query *Query) getQueryWhere(permissionFields *map[string]interface{})(string,int) {
-	if permissionFields == nil {
+func (query *Query) getQueryWhere(permissionFilter *map[string]interface{})(string,int) {
+	if permissionFilter == nil {
 		return FilterToSQLWhere(query.Filter)
 	}
 
 	if query.Filter == nil {
-		return FilterToSQLWhere(permissionFields)
+		return FilterToSQLWhere(permissionFilter)
 	}
 
 	filter:=&map[string]interface{}{
 		Op_and:[]interface{}{
 			*(query.Filter),
-			*permissionFields,
+			*permissionFilter,
 		},
 	}
 

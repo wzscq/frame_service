@@ -61,7 +61,7 @@ func (save *Save)getUpdateCommonFieldsValues()(string){
 	commonValue:=CC_UPDATE_TIME+"='"+now+"',"+          //last_upate_time
 				 CC_UPDATE_USER+"='"+save.UserID+"',"+  //last_update_user
 				 CC_VERSION+"="+CC_VERSION+"+1"                  //version
-	
+				 
 	return commonValue
 }
 
@@ -70,7 +70,9 @@ func (save *Save)isIgnoreFieldUpdate(field string)(bool){
 		field == CC_CREATE_TIME ||
 		field == CC_CREATE_USER ||
 		field == CC_UPDATE_TIME ||
-		field == CC_UPDATE_USER {
+		field == CC_UPDATE_USER ||
+		field == CC_VERSION ||
+		field == CC_ID {
 		return true
 	}
 	return false
@@ -94,16 +96,16 @@ func (save *Save)getRowUpdateColumnValues(row map[string]interface{},permissionF
 	version:=""
 	permissionFields=","+permissionFields+","
 	for key, value := range row {
-		//跳过操作类型字段和系统保留字段
-		if save.isIgnoreFieldUpdate(key) {
-			continue
-		}
-
 		//对于version和id字段，只是取出值用于更新数据的where条件部分使用，其值不用于更新
 		if key == CC_VERSION {
 			version=value.(string)
 		} else if key == CC_ID {
 			strID=value.(string)
+		}
+
+		//跳过操作类型字段和系统保留字段
+		if save.isIgnoreFieldUpdate(key) {
+			continue
 		}
 
 		//跳过没有权限的字段

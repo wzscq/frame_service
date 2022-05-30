@@ -52,6 +52,7 @@ const (
 	ResultNoUserRole=10000034
 	ResultNoPermission=10000035
 	ResultNotDeleteData=10000036
+	ResultUpdateFieldNotFound=10000037
 )
 
 var errMsg = map[int]CommonResult{
@@ -347,6 +348,14 @@ var errMsg = map[int]CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultNotDeleteData,
 			Message:"删除数据失败，数据不存在或您没有权限删除相应数据",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultUpdateFieldNotFound:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultUpdateFieldNotFound,
+			Message:"更新数据失败，未指定需要更新的字段",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	

@@ -126,11 +126,41 @@ func (controller *DataController) delete(c *gin.Context) {
 	result,errorCode=delete.Execute(controller.DataRepository)
 	rsp:=common.CreateResponse(errorCode,result)
 	c.IndentedJSON(http.StatusOK, rsp.Rsp)
-	log.Println("end data save")
+	log.Println("end data delete")
 }
 
 func (controller *DataController) update(c *gin.Context) {
+	log.Println("start data update")
+	//获取用户账号
+	userID:= c.MustGet("userID").(string)
+	userRoles:= c.MustGet("userRoles").(string)
+	appDB:= c.MustGet("appDB").(string)
+	var rep commonRep
+	var errorCode int
+	var result *map[string]interface {} = nil
+	if err := c.BindJSON(&rep); err != nil {
+		log.Println(err)
+		errorCode=common.ResultWrongRequest
+		rsp:=common.CreateResponse(errorCode,result)
+		c.IndentedJSON(http.StatusOK, rsp.Rsp)
+		log.Println("end data update with error")
+		return
+    }
 
+	update:=&Update{
+		ModelID:rep.ModelID,
+		ViewID:rep.ViewID,
+		AppDB:appDB,
+		UserID:userID,
+		SelectedRowKeys:rep.SelectedRowKeys,
+		UserRoles:userRoles,
+		List:rep.List,
+		Filter:rep.Filter,
+	}
+	result,errorCode=update.Execute(controller.DataRepository)
+	rsp:=common.CreateResponse(errorCode,result)
+	c.IndentedJSON(http.StatusOK, rsp.Rsp)
+	log.Println("end data update")
 }
 
 func (controller *DataController)download(c *gin.Context) {
