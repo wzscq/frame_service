@@ -9,7 +9,7 @@ import (
 
 type fieldConf struct {
 	Field string `json:"field"`
-    Name string `json:"name"`
+    Name interface{} `json:"name"`
     DataType string `json:"dataType"`
 	QuickSearch bool `json:"quickSearch"`
 	//以下字段是在关联字段的级联查询中需要携带的参数，用于关联表数据的查询
@@ -21,11 +21,11 @@ type fieldConf struct {
 
 type operationConf struct {
 	ID string `json:"id"`
-	Name string `json:"name"`
+	Name interface{} `json:"name"`
 	Type string `json:"type"`
 	Params map[string]interface{} `json:"params"`
 	Input map[string]interface{} `json:"input"`
-	Description string `json:"description"`
+	Description interface{} `json:"description"`
 	SuccessOperation *operationConf `json:"successOperation,omitempty"`
 	ErrorOperation *operationConf `json:"errorOperation,omitempty"`
 	Roles *interface{} `json:"roles"`
@@ -33,7 +33,7 @@ type operationConf struct {
 
 type buttonConf struct {
 	OperationID string `json:"operationID"`
-	Name string `json:"name"`
+	Name *interface{} `json:"name,omitempty"`
 	Prompt *string `json:"prompt,omitempty"`
 }
 
@@ -50,7 +50,7 @@ type viewToolbarConf struct {
 
 type viewConf struct {
 	ViewID string `json:"viewID"`
-	Name string `json:"name"`
+	Name interface{} `json:"name"`
 	Description string `json:"description"`
 	Fields []map[string]interface{} `json:"fields"`
 	Filter map[string]interface{} `json:"filter"`

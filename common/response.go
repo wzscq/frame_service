@@ -53,6 +53,8 @@ const (
 	ResultNoPermission=10000035
 	ResultNotDeleteData=10000036
 	ResultUpdateFieldNotFound=10000037
+	ResultI18nNoLangList=10000038
+	ResultI18nNoLang=10000039
 )
 
 var errMsg = map[int]CommonResult{
@@ -356,6 +358,22 @@ var errMsg = map[int]CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultUpdateFieldNotFound,
 			Message:"更新数据失败，未指定需要更新的字段",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultI18nNoLangList:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultI18nNoLangList,
+			Message:"获取语言资源错误，未定义系统支持的语言种类",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultI18nNoLang:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultI18nNoLang,
+			Message:"获取语言资源错误，未找到对应语言翻译",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	

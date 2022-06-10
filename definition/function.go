@@ -9,17 +9,18 @@ import (
 
 type functionItem struct {
 	ID string `json:"id"`
-    Name string `json:"name"`
-    Description string `json:"description"`
+    Name interface{} `json:"name"`
+    Description interface{} `json:"description"`
 	Operation map[string]interface{} `json:"operation"`
 	Icon string `json:"icon"`
 	Roles *interface{} `json:"roles"`
+	OpenLabel *interface{} `json:"openLabel,omitempty"`
 }
 
 type functionGroup struct {
 	ID string `json:"id"`
-    Name string `json:"name"`
-    Description string `json:"description"`
+    Name interface{} `json:"name"`
+    Description interface{} `json:"description"`
 	Children []functionItem `json:"children"`
 }
 

@@ -115,10 +115,26 @@ func (controller *DefinitionController)getAppImage(c *gin.Context){
 	log.Println("end definition getAppImage")
 }
 
+func (controller *DefinitionController)getAppI18n(c *gin.Context){
+	log.Println("start definition getAppI18n")
+	appDB:= c.MustGet("appDB").(string)
+	locale := c.Param("locale")
+	
+	i18n:=i18n{
+		AppDB:appDB,
+		Locale:locale,
+	}	
+	appI18n,errorCode:=i18n.getAppI18n()
+	rsp:=common.CreateResponse(errorCode,appI18n)
+	c.IndentedJSON(http.StatusOK, rsp.Rsp)
+	log.Println("end definition getAppI18n")
+}
+
 func (controller *DefinitionController) Bind(router *gin.Engine) {
 	log.Println("Bind DefinitionController")
 	router.POST("/definition/getUserFunction", controller.getUserFunction)
 	router.POST("/definition/getModelViewConf", controller.getModelViewConf)
 	router.POST("/definition/getModelFormConf", controller.getModelFormConf)
 	router.GET("/appimages/:appId/:image", controller.getAppImage)
+	router.GET("/appI18n/:appId/:locale", controller.getAppI18n)
 }
