@@ -311,30 +311,6 @@ func (save *Save) deleteRow(
 	return result,errorCode
 }
 
-//对于未提供操作类型的数据行，直接返回传入的参数
-func (save *Save) getNilOperationRowResult(
-	row map[string]interface{},
-	permissionDS *definition.Dataset)(map[string]interface{},int){
-	log.Println("start data save getNilOperationRowResult")
-	_,strID,version,errCode:=save.getRowUpdateColumnValues(row,permissionDS.Fields)
-	if errCode!=common.ResultSuccess{
-		return nil,errCode
-	}
-
-	if len(strID)<=0 {
-		return nil,common.ResultNoIDWhenUpdate
-	} 
-
-	if len(version)<=0 {
-		return nil,common.ResultNoVersionWhenUpdate
-	}
-
-	result := map[string]interface{}{}
-	result["id"]=strID
-	log.Println("end data save getNilOperationRowResult")
-	return result,common.ResultSuccess
-}
-
 func (save *Save) updateRow(
 	dataRepository DataRepository,
 	tx *sql.Tx,
@@ -406,8 +382,8 @@ func (save *Save) saveRow(
 			return save.deleteRow(dataRepository,tx,modelID,row,permissionDS)
 		case SAVE_UPDATE:
 			return save.updateRow(dataRepository,tx,modelID,row,permissionDS)
-		case nil:
-			return save.getNilOperationRowResult(row,permissionDS)
+		//case nil:
+		//	return save.getNilOperationRowResult(row,permissionDS)
 		default:
 			return nil,common.ResultNotSupportedSaveType
 	}
@@ -417,7 +393,12 @@ func (save *Save) SaveList(dataRepository DataRepository,tx *sql.Tx)(*saveResult
 	log.Println("start data save SaveList")
 	//循环执行每个行
 	if len(*save.List) == 0 {
-		return nil,common.ResultWrongRequest
+		result:=&saveResult{
+			ModelID:save.ModelID,
+			Total:0,
+			List:[]map[string]interface{}{},
+		}
+		return result,common.ResultSuccess
 	}
 
 	//获取用户权限
