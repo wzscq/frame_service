@@ -32,7 +32,9 @@ func (dr *DeleteReleated)deleteFile(dataRepository DataRepository,tx *sql.Tx)(in
 	files, err := os.ReadDir(path)
 	if err!=nil {
 		log.Println("deleteFile ReadDir error:", err)
-		return common.ResultReadDirError
+		//return common.ResultReadDirError
+		//如果文件夹不存在说明没有对应的相关文件，不需要返回错误
+		return common.ResultSuccess
 	}
 
 	for _, file := range files {
