@@ -56,6 +56,7 @@ type viewConf struct {
 	Filter map[string]interface{} `json:"filter"`
 	Toolbar *viewToolbarConf `json:"toolbar,omitempty"`
 	Roles *interface{} `json:"roles"`
+	RowStyle *string `json:"rowStyle,omitempty"`
 }
 
 type modelViewConf struct {
