@@ -55,6 +55,7 @@ const (
 	ResultUpdateFieldNotFound=10000037
 	ResultI18nNoLangList=10000038
 	ResultI18nNoLang=10000039
+	ResultStartFlowWithoutID=20000001
 )
 
 var errMsg = map[int]CommonResult{
@@ -374,6 +375,14 @@ var errMsg = map[int]CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultI18nNoLang,
 			Message:"获取语言资源错误，未找到对应语言翻译",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultStartFlowWithoutID:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultStartFlowWithoutID,
+			Message:"在执行Flow时没有提供Flow的ID，请与管理员联系处理",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	

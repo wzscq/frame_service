@@ -8,6 +8,7 @@ import (
     "crv/frame/data"
     "crv/frame/common"
     "crv/frame/redirect"
+    "crv/frame/flow"
     "time"
     "log"
 )
@@ -67,5 +68,13 @@ func main() {
 
     redirectController:=&redirect.RedirectController{}
     redirectController.Bind(router)
+
+    flowInstanceRepository:=&flow.DefaultFlowInstanceRepository{}
+    flowInstanceRepository.Init(conf.Redis.Server,2,0)
+    flowController:=&flow.FlowController{
+        InstanceRepository:flowInstanceRepository
+    }
+    flowController.Bind(router)
+
     router.Run(conf.Service.Port)
 }
