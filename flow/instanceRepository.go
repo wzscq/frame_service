@@ -30,7 +30,8 @@ func (repo *DefaultFlowInstanceRepository)saveInstance(instance *flowInstance)(e
 	return repo.client.Set(repo.client.Context(), instance.InstanceID, *instance, repo.expire).Err()
 }
 
-func (repo *DefaultFlowInstanceRepository)getInstance(instanceID string)(flowInstance,error){
-	return repo.client.Get(repo.client.Context(), instanceID).Result()
+func (repo *DefaultFlowInstanceRepository)getInstance(instanceID string)(*flowInstance){
+	//return repo.client.Get(repo.client.Context(), instanceID).Result()
+	return nil
 }
 

@@ -1,10 +1,10 @@
 package data
 
 const (
-	FIELDTYPE_MANY2MANY = "MANY_TO_MANY"
-	FIELDTYPE_MANY2ONE = "MANY_TO_ONE"
-	FIELDTYPE_ONE2MANY = "ONE_TO_MANY"
-	FIELDTYPE_FILE = "FILE"
+	FIELDTYPE_MANY2MANY = "many2many"
+	FIELDTYPE_MANY2ONE = "many2one"
+	FIELDTYPE_ONE2MANY = "one2many"
+	FIELDTYPE_FILE = "file"
 )
 
 type QueryRelatedModel interface {

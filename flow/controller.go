@@ -25,7 +25,7 @@ type flowResult struct {
 }
 
 type FlowController struct {
-	InstanceRepository *FlowInstanceRepository
+	InstanceRepository FlowInstanceRepository
 }
 
 func (controller *FlowController)start(c *gin.Context){
