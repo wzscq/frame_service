@@ -5,6 +5,8 @@ import (
 	"os"
 	"crv/frame/common"
 	"encoding/json"
+	"github.com/rs/xid"
+    "time"
 )
 
 type node struct {
@@ -48,7 +50,8 @@ func loadFlowConf(appDB,flowID string)(*flowConf,int){
 }
 
 func getInstanceID(appDB,flowID string)(string){
-	return appDB+"_"+flowID
+	guid := xid.New().String()
+	return appDB+"_"+flowID+"_"+guid
 }
 
 func createInstance(appDB,flowID,userID string)(*flowInstance,int){
@@ -66,6 +69,8 @@ func createInstance(appDB,flowID,userID string)(*flowInstance,int){
 	 	UserID:userID,
 	 	FlowConf:flowCfg,
 	 	ExecutedNodes:[]executedNode{},
+		Completed:false,
+		StartTime:time.Now().Format("2006-01-02 15:04:05"),
 	}
 	
 	return instance,common.ResultSuccess

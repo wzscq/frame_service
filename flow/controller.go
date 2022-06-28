@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-type flowRep struct {
+//流中的请求和应答采用相同的结构，便于不同节点间传递数据
+type flowRepRsp struct {
 	ModelID *string `json:"modelID"`
 	ViewID *string `json:"viewID"`
 	Filter *map[string]interface{} `json:"filter"`
@@ -18,10 +19,9 @@ type flowRep struct {
 	Pagination *interface{} `json:"pagination"`
 	FlowID *string `json:"flowID"`
 	FlowInstanceID *string `json:"flowInstanceID"`
-}
-
-type flowResult struct {
-
+	Total *int `json:"total,omitempty"`
+	Operation *[]map[string]interface{} `json:"operation,omitempty"`
+	Value *string `json:"value,omitempty"`
 }
 
 type FlowController struct {
@@ -35,8 +35,8 @@ func (controller *FlowController)start(c *gin.Context){
 	userID:= c.MustGet("userID").(string)
 	appDB:= c.MustGet("appDB").(string)
 
-	var rep flowRep
-	var result *flowResult
+	var rep flowRepRsp
+	var result *flowRepRsp
 	if err := c.BindJSON(&rep); err != nil {
 		log.Println(err)
 		rsp:=common.CreateResponse(common.ResultWrongRequest,result)
@@ -64,6 +64,17 @@ func (controller *FlowController)start(c *gin.Context){
 	//执行流
 	result,errorCode=flowInstance.push(&rep)
 
+	//如果流中存在待执行的节点，则保存流实例到缓存
+	if !flowInstance.Completed {
+		err:=controller.InstanceRepository.saveInstance(flowInstance)
+		if err!=nil {
+			rsp:=common.CreateResponse(common.ResultCacheFlowInstanceError,result)
+			c.IndentedJSON(http.StatusOK, rsp.Rsp)
+			log.Println("end FlowController start")
+			return
+		}
+	}
+	
 	rsp:=common.CreateResponse(errorCode,result)
 	c.IndentedJSON(http.StatusOK, rsp.Rsp)
 	log.Println("end FlowController start")
