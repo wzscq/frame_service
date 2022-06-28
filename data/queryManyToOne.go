@@ -29,7 +29,7 @@ func (queryManyToOne *QueryManyToOne)mergeResult(res *queryResult,relatedRes *qu
 					List:[]map[string]interface{}{},
 				}
 				row[fieldName]=value
-			default:
+			case *queryResult:
 				strValue=*(value.(*queryResult).Value)
 			}
 

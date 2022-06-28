@@ -55,6 +55,9 @@ const (
 	ResultUpdateFieldNotFound=10000037
 	ResultI18nNoLangList=10000038
 	ResultI18nNoLang=10000039
+	ResultStartFlowWithoutID=20000001
+	ResultCacheFlowInstanceError=20000002
+	ResultNoExecutorForNodeType=20000003
 )
 
 var errMsg = map[int]CommonResult{
@@ -377,6 +380,30 @@ var errMsg = map[int]CommonResult{
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,	
+	},
+	ResultStartFlowWithoutID:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultStartFlowWithoutID,
+			Message:"在执行Flow时没有提供Flow的ID，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,	
+	},
+	ResultCacheFlowInstanceError:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultCacheFlowInstanceError,
+			Message:"缓存Flow实例数据出错，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,
+	},
+	ResultNoExecutorForNodeType:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultNoExecutorForNodeType,
+			Message:"执行流时遇到不支持的节点类型，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,
 	},
 }
 
