@@ -40,6 +40,8 @@ func (repo *DefaultFlowInstanceRepository)saveInstance(instance *flowInstance)(e
 }
 
 func (repo *DefaultFlowInstanceRepository)getInstance(instanceID string)(*flowInstance,error){
+	jsonStr,err:=repo.client.Get(repo.client.Context(), instanceID).Result()
+	if err!=nil {
 		log.Println("get flow instance error:",err.Error())
 		return nil,err
 	}
