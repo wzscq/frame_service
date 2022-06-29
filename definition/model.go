@@ -34,7 +34,7 @@ type operationConf struct {
 type buttonConf struct {
 	OperationID string `json:"operationID"`
 	Name *interface{} `json:"name,omitempty"`
-	Prompt *string `json:"prompt,omitempty"`
+	Prompt *interface{} `json:"prompt,omitempty"`
 }
 
 type toolbarConf struct {
