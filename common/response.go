@@ -58,6 +58,9 @@ const (
 	ResultStartFlowWithoutID=20000001
 	ResultCacheFlowInstanceError=20000002
 	ResultNoExecutorForNodeType=20000003
+	ResultNoNodeOfGivenID=20000004
+	ResultPushFlowWithoutID=20000005
+	ResultLoadFlowInstanceError=20000006
 )
 
 var errMsg = map[int]CommonResult{
@@ -401,6 +404,30 @@ var errMsg = map[int]CommonResult{
 		Rsp:&CommonRsp{
 			ErrorCode:ResultNoExecutorForNodeType,
 			Message:"执行流时遇到不支持的节点类型，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,
+	},
+	ResultNoNodeOfGivenID:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultNoNodeOfGivenID,
+			Message:"执行流时找不到对应ID的节点，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,
+	},
+	ResultPushFlowWithoutID:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultPushFlowWithoutID,
+			Message:"执行流时未提供流的实例ID，请与管理员联系处理",
+			Error:true,
+		},
+		Status:http.StatusInternalServerError,
+	},
+	ResultLoadFlowInstanceError:CommonResult{
+		Rsp:&CommonRsp{
+			ErrorCode:ResultLoadFlowInstanceError,
+			Message:"执行流时加载流实例失败，请与管理员联系处理",
 			Error:true,
 		},
 		Status:http.StatusInternalServerError,

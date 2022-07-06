@@ -1,15 +1,25 @@
 {
-    "redis":{
+    "redis_huawei":{
         "server":"121.37.174.251:6479",
         "tokenExpired":"6000s"
     },
-    "mysql":{
+    "redis":{
+        "server":"124.70.36.168:6479",
+        "tokenExpired":"6000s"
+    },
+    "mysql_huawei":{
         "server":"121.37.174.251:4306",
         "password":"123456",
         "user":"root",
         "dbName":"car"
     },
-    "mysql_car":{
+    "mysql":{
+        "server":"124.70.36.168:4306",
+        "password":"123456",
+        "user":"root",
+        "dbName":"diagnosis"
+    },
+    "mysql_car_demo":{
         "server":"121.36.222.9:4306",
         "password":"123456",
         "user":"root",
